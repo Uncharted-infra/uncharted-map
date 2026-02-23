@@ -56,7 +56,7 @@ function SidebarContent({
                 variant="ghost"
                 size="icon"
                 onClick={toggleCollapsed}
-                className="font-departure-mono absolute inset-0 m-auto flex h-8 w-8 shrink-0 items-center justify-center opacity-0 transition-opacity group-hover:opacity-100"
+                className="font-departure-mono absolute inset-0 m-auto flex h-8 w-8 shrink-0 items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 border-0 shadow-none hover:bg-transparent"
                 aria-label="Expand sidebar"
               >
                 <PanelLeftOpen className="h-4 w-4" />
@@ -78,7 +78,7 @@ function SidebarContent({
                   variant="ghost"
                   size="icon"
                   onClick={toggleCollapsed}
-                  className="font-departure-mono h-8 w-8 shrink-0"
+                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
                   aria-label="Collapse sidebar"
                 >
                   <PanelLeftClose className="h-4 w-4" />
@@ -94,9 +94,9 @@ function SidebarContent({
               key={item.label}
               variant="ghost"
               className={cn(
-                "font-departure-mono text-sm",
+                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
                 isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
-                pathname === item.href && "bg-accent"
+                pathname === item.href && "bg-transparent"
               )}
               asChild
             >
@@ -130,7 +130,7 @@ function SidebarContent({
           <Button
             variant="ghost"
             size="icon"
-            className={cn("ml-auto shrink-0", isCollapsed && "ml-0 w-full justify-center")}
+            className={cn("ml-auto shrink-0 border-0 shadow-none hover:bg-transparent", isCollapsed && "ml-0 w-full justify-center")}
             asChild
           >
             <Link href="/settings" onClick={onLinkClick} title={isCollapsed ? "Settings" : undefined}>

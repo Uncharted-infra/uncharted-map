@@ -18,8 +18,8 @@ export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
     return (
       <div
         className={cn(
-          "flex flex-col gap-1 p-2 rounded-lg bg-muted/50",
-          collapsed && "items-center"
+          "flex gap-1 p-2",
+          collapsed ? "flex-col items-center" : "flex-row"
         )}
       >
         <div className="h-8 w-8 shrink-0 rounded-md bg-muted" />
@@ -32,35 +32,44 @@ export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-1 p-2 rounded-lg bg-muted/50",
-        collapsed && "items-center"
+        "flex gap-1 p-2 w-full",
+        collapsed ? "flex-col items-center" : "flex-row"
       )}
     >
       <Button
-        variant={theme === "light" ? "secondary" : "ghost"}
+        variant="ghost"
         size="icon"
         onClick={() => setTheme("light")}
-        className={cn("h-8 w-8 shrink-0", theme === "light" && "bg-background")}
+        className={cn(
+          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          collapsed ? "w-8" : "flex-1 min-w-0"
+        )}
         aria-label="Light mode"
         title="Light"
       >
         <Sun className="h-4 w-4" />
       </Button>
       <Button
-        variant={theme === "dark" ? "secondary" : "ghost"}
+        variant="ghost"
         size="icon"
         onClick={() => setTheme("dark")}
-        className={cn("h-8 w-8 shrink-0", theme === "dark" && "bg-background")}
+        className={cn(
+          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          collapsed ? "w-8" : "flex-1 min-w-0"
+        )}
         aria-label="Dark mode"
         title="Dark"
       >
         <Moon className="h-4 w-4" />
       </Button>
       <Button
-        variant={theme === "system" ? "secondary" : "ghost"}
+        variant="ghost"
         size="icon"
         onClick={() => setTheme("system")}
-        className={cn("h-8 w-8 shrink-0", theme === "system" && "bg-background")}
+        className={cn(
+          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          collapsed ? "w-8" : "flex-1 min-w-0"
+        )}
         aria-label="System theme"
         title="System"
       >
