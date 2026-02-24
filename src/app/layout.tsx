@@ -9,8 +9,18 @@ const fenix = localFont({
 });
 
 const departureMono = localFont({
-  src: "../../fonts/Departure_Mono/DepartureMono-Regular.woff",
+  src: "../../fonts/Departure_Mono/DepartureMono-Regular.otf",
   variable: "--font-departure-mono",
+});
+
+const wenkaiMono = localFont({
+  src: "../../fonts/LXGW_WenKai_Mono_TC/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Regular.ttf",
+  variable: "--font-wenkai-mono",
+});
+
+const wenkaiMonoBold = localFont({
+  src: "../../fonts/LXGW_WenKai_Mono_TC/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Bold.ttf",
+  variable: "--font-wenkai-mono-bold",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${fenix.variable} ${departureMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fenix.variable} ${departureMono.variable} ${wenkaiMono.variable} ${wenkaiMonoBold.variable}`}>
       <body suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

@@ -80,6 +80,6 @@
     @apply border-border shadow-none;
   }
   body {
-    @apply bg-background text-foreground font-fenix antialiased;
+    @apply bg-background text-foreground font-wenkai-mono-bold antialiased;
   }
 }

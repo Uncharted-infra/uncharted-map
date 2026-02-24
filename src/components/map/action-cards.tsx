@@ -29,9 +29,9 @@ export function DestinationCard({
         )}
       </div>
       <CardHeader className="pb-2">
-        <h3 className="font-semibold">{name}</h3>
+        <h3 className="font-departure-mono font-semibold">{name}</h3>
         <p className="text-sm text-muted-foreground">{overview}</p>
-        <p className="font-departure-mono text-xs text-muted-foreground">Best time: {bestTime}</p>
+        <p className="font-wenkai-mono-bold text-xs text-muted-foreground">Best time: {bestTime}</p>
       </CardHeader>
       <CardFooter className="gap-2">
         <Button size="sm">Plan Trip</Button>
@@ -59,9 +59,9 @@ export function FlightOptionCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Plane className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium">{airline}</span>
+            <span className="font-wenkai-mono-bold font-medium">{airline}</span>
           </div>
-          <span className="font-departure-mono font-semibold">{price}</span>
+          <span className="font-wenkai-mono-bold font-semibold">{price}</span>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
           {departure} → {arrival}
@@ -92,7 +92,7 @@ export function HotelCard({
       </div>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold">{name}</h3>
+          <h3 className="font-departure-mono font-semibold">{name}</h3>
           <Badge variant="secondary">{rating}/5</Badge>
         </div>
         <p className="text-sm text-muted-foreground">{location}</p>
@@ -119,9 +119,9 @@ export function ActivityCard({
   return (
     <Card className="animate-fade-slide-up">
       <CardContent className="pt-4">
-        <h3 className="font-semibold">{name}</h3>
+        <h3 className="font-departure-mono font-semibold">{name}</h3>
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
-        <p className="font-departure-mono text-xs mt-2">{duration}</p>
+        <p className="font-wenkai-mono-bold text-xs mt-2">{duration}</p>
         <div className="flex flex-wrap gap-1 mt-2">
           {timeslots.map((slot) => (
             <Badge key={slot} variant="outline" className="text-xs">
@@ -153,7 +153,7 @@ export function ItineraryDayCard({
         <ul className="space-y-2">
           {activities.map((a, i) => (
             <li key={i} className="flex gap-2 text-sm">
-              <span className="font-departure-mono text-muted-foreground shrink-0">{a.time}</span>
+              <span className="font-wenkai-mono-bold text-muted-foreground shrink-0">{a.time}</span>
               <span>{a.title}</span>
             </li>
           ))}
@@ -177,7 +177,7 @@ export function ConfirmationCard({
           <CheckCircle className="h-5 w-5 text-green-600" />
           <span className="font-semibold">Confirmed</span>
         </div>
-        <p className="font-departure-mono text-sm mt-2">#{reservationNumber}</p>
+        <p className="font-wenkai-mono-bold text-sm mt-2">#{reservationNumber}</p>
         <p className="text-sm text-muted-foreground">{date}</p>
       </CardContent>
       <CardFooter className="gap-2">

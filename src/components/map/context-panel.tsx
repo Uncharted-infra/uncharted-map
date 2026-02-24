@@ -40,11 +40,11 @@ export function ContextPanel({ className }: { className?: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-1 text-sm">
-              <p className="font-departure-mono text-muted-foreground">Dates</p>
+              <p className="font-wenkai-mono-bold text-muted-foreground">Dates</p>
               <p>{PLACEHOLDER_TRIP.dates}</p>
-              <p className="font-departure-mono text-muted-foreground mt-2">Travelers</p>
+              <p className="font-wenkai-mono-bold text-muted-foreground mt-2">Travelers</p>
               <p>{PLACEHOLDER_TRIP.travelers}</p>
-              <p className="font-departure-mono text-muted-foreground mt-2">Destination</p>
+              <p className="font-wenkai-mono-bold text-muted-foreground mt-2">Destination</p>
               <p>{PLACEHOLDER_TRIP.destination}</p>
             </CardContent>
           </Card>
@@ -78,7 +78,7 @@ export function ContextPanel({ className }: { className?: string }) {
               <ul className="space-y-2 text-sm">
                 {PLACEHOLDER_TRIP.bookings.map((b, i) => (
                   <li key={i}>
-                    <span className="font-departure-mono text-muted-foreground">{b.type}:</span>{" "}
+                    <span className="font-wenkai-mono-bold text-muted-foreground">{b.type}:</span>{" "}
                     {b.detail}
                   </li>
                 ))}
@@ -94,10 +94,10 @@ export function ContextPanel({ className }: { className?: string }) {
             </CardHeader>
             <CardContent className="space-y-1 text-sm">
               <p>
-                Estimated: <span className="font-departure-mono">${PLACEHOLDER_TRIP.budget.estimated.toLocaleString()}</span>
+                Estimated: <span className="font-wenkai-mono-bold">${PLACEHOLDER_TRIP.budget.estimated.toLocaleString()}</span>
               </p>
               <p>
-                Paid: <span className="font-departure-mono">${PLACEHOLDER_TRIP.budget.paid.toLocaleString()}</span>
+                Paid: <span className="font-wenkai-mono-bold">${PLACEHOLDER_TRIP.budget.paid.toLocaleString()}</span>
               </p>
             </CardContent>
           </Card>

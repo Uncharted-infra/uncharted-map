@@ -44,13 +44,13 @@ If you believe a design system change is required, you must explain why and ask 
 
 ## Typography
 
-The site uses two fonts:
+The site uses three fonts:
 
-**Fenix** — Default font for the site and Map UI.  
-Use for all landing content, chat messages, headings, paragraphs, and UI text. Applied via `font-landing`.
+**Departure Mono** (`font-departure-mono`) — Titles, button labels, and anything big: navbar branding, sidebar titles, section headings, card titles, major control labels.
 
-**Departure Mono** — Only for navbar branding, sidebar titles, and major control labels.  
-Applied via `font-navbar-title`.
+**WenKai Mono Bold** (`font-wenkai-mono-bold`) — Everything else: body text, form labels, inputs, placeholders, user messages, and general UI. Use with `placeholder:font-wenkai-mono-bold` for inputs. Applied to `body` by default.
+
+**Fenix** (`font-fenix`) — Agent replies only. When the user submits a query, the agent's response uses Fenix so users can distinguish user messages from agent messages.
 
 Do not introduce additional fonts.
 

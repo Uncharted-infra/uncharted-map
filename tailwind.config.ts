@@ -19,6 +19,16 @@ const config: Config = {
   				'var(--font-departure-mono)',
   				'ui-monospace',
   				'monospace'
+  			],
+  			'wenkai-mono': [
+  				'var(--font-wenkai-mono)',
+  				'ui-monospace',
+  				'monospace'
+  			],
+  			'wenkai-mono-bold': [
+  				'var(--font-wenkai-mono-bold)',
+  				'ui-monospace',
+  				'monospace'
   			]
   		},
   		keyframes: {

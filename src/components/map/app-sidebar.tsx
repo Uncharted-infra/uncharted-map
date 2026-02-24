@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
@@ -13,22 +14,45 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Sun,
+  Moon,
+  Monitor,
+  MapPinPlus,
+  ChevronDown,
+  MapPin,
+  Building2,
+  Plane,
+  Activity,
 } from "lucide-react";
 import { useSidebar } from "@/contexts/sidebar-context";
-import { ThemeToggle } from "./theme-toggle";
 import { PassportIcon } from "@/components/icons/passport-icon";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { icon: Search, label: "Search", href: "/" },
-  { icon: Map, label: "Trips", href: "/" },
-  { icon: Users, label: "Friends", href: "/" },
-  { icon: Briefcase, label: "Luggage", href: "/" },
-  { icon: "passport", label: "Passport", href: "/" },
+// Placeholder trips - will be replaced with real data when trips are created
+const PLACEHOLDER_TRIPS: { id: string; name: string }[] = [];
+
+const luggageItems = [
+  { icon: MapPin, label: "Places", href: "/luggage/places" },
+  { icon: Building2, label: "Hotels", href: "/luggage/hotels" },
+  { icon: Plane, label: "Flights", href: "/luggage/flights" },
+] as const;
+
+const passportItems = [
+  { icon: Plane, label: "Flights", href: "/passport/flights" },
+  { icon: Building2, label: "Hotels", href: "/passport/hotels" },
+  { icon: Activity, label: "Activities", href: "/passport/activities" },
 ] as const;
 
 function SidebarContent({
@@ -37,7 +61,11 @@ function SidebarContent({
 }: { onLinkClick?: () => void; forceExpanded?: boolean }) {
   const pathname = usePathname();
   const { collapsed, toggleCollapsed } = useSidebar();
+  const { theme, setTheme } = useTheme();
   const isCollapsed = forceExpanded ? false : collapsed;
+  const [tripsOpen, setTripsOpen] = useState(false);
+  const [luggageOpen, setLuggageOpen] = useState(false);
+  const [passportOpen, setPassportOpen] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -89,54 +117,229 @@ function SidebarContent({
         </div>
 
         <nav className={cn("flex flex-col gap-1 px-2 pb-4", isCollapsed ? "px-2" : "px-4")}>
-          {navItems.map((item) => (
+          <Button
+            variant="ghost"
+            className={cn(
+              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
+            )}
+            asChild
+          >
+            <Link href="/" onClick={onLinkClick} title={isCollapsed ? "New Trip" : undefined}>
+              <MapPinPlus className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "New Trip"}
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
+              pathname === "/" && "bg-transparent"
+            )}
+            asChild
+          >
+            <Link href="/" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
+              <Search className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Search"}
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
+            )}
+            asChild
+          >
+            <Link href="/friends" onClick={onLinkClick} title={isCollapsed ? "Friends" : undefined}>
+              <Users className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Friends"}
+            </Link>
+          </Button>
+
+          <div className="flex flex-col gap-0.5">
             <Button
-              key={item.label}
               variant="ghost"
               className={cn(
                 "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
-                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
-                pathname === item.href && "bg-transparent"
+                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
               )}
-              asChild
+              title={isCollapsed ? "Trips" : undefined}
+              onClick={() => {
+                if (isCollapsed) {
+                  toggleCollapsed();
+                  setTripsOpen(true);
+                } else {
+                  setTripsOpen((o) => !o);
+                }
+              }}
             >
-              <Link href={item.href} onClick={onLinkClick} title={isCollapsed ? item.label : undefined}>
-                {item.icon === "passport" ? (
-                  <PassportIcon />
-                ) : (
-                  <item.icon className="h-4 w-4 shrink-0" />
-                )}
-                {!isCollapsed && item.label}
-              </Link>
+              <Map className="h-4 w-4 shrink-0" />
+              {!isCollapsed && (
+                <>
+                  <span className="flex-1 text-left">Trips</span>
+                  <ChevronDown
+                    className={cn("h-4 w-4 shrink-0 transition-transform", tripsOpen && "rotate-180")}
+                  />
+                </>
+              )}
             </Button>
-          ))}
+            {!isCollapsed && tripsOpen && (
+              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
+                {PLACEHOLDER_TRIPS.length === 0 ? (
+                  <span className="font-departure-mono text-xs text-muted-foreground py-1">
+                    No trips yet
+                  </span>
+                ) : (
+                  PLACEHOLDER_TRIPS.map((trip) => (
+                    <Link
+                      key={trip.id}
+                      href={`/trips/${trip.id}`}
+                      onClick={onLinkClick}
+                      className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1"
+                    >
+                      {trip.name}
+                    </Link>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-0.5">
+            <Button
+              variant="ghost"
+              className={cn(
+                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
+              )}
+              title={isCollapsed ? "Luggage" : undefined}
+              onClick={() => {
+                if (isCollapsed) {
+                  toggleCollapsed();
+                  setLuggageOpen(true);
+                } else {
+                  setLuggageOpen((o) => !o);
+                }
+              }}
+            >
+              <Briefcase className="h-4 w-4 shrink-0" />
+              {!isCollapsed && (
+                <>
+                  <span className="flex-1 text-left">Luggage</span>
+                  <ChevronDown
+                    className={cn("h-4 w-4 shrink-0 transition-transform", luggageOpen && "rotate-180")}
+                  />
+                </>
+              )}
+            </Button>
+            {!isCollapsed && luggageOpen && (
+              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
+                {luggageItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={onLinkClick}
+                    className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2"
+                  >
+                    <item.icon className="h-3.5 w-3.5 shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-0.5">
+            <Button
+              variant="ghost"
+              className={cn(
+                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
+              )}
+              title={isCollapsed ? "Passport" : undefined}
+              onClick={() => {
+                if (isCollapsed) {
+                  toggleCollapsed();
+                  setPassportOpen(true);
+                } else {
+                  setPassportOpen((o) => !o);
+                }
+              }}
+            >
+              <PassportIcon />
+              {!isCollapsed && (
+                <>
+                  <span className="flex-1 text-left">Passport</span>
+                  <ChevronDown
+                    className={cn("h-4 w-4 shrink-0 transition-transform", passportOpen && "rotate-180")}
+                  />
+                </>
+              )}
+            </Button>
+            {!isCollapsed && passportOpen && (
+              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
+                {passportItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={onLinkClick}
+                    className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2"
+                  >
+                    <item.icon className="h-3.5 w-3.5 shrink-0" />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
       </div>
 
-      <div className={cn("shrink-0 border-t border-border p-4", isCollapsed && "p-2")}>
-        <div className={cn("mb-4 w-full", isCollapsed && "flex justify-center")}>
-          <ThemeToggle collapsed={isCollapsed} />
-        </div>
-        <Separator className="mb-4" />
-        <div
-          className={cn(
-            "flex items-center gap-3",
-            isCollapsed && "flex-col justify-center"
-          )}
-        >
-          <Avatar className="h-8 w-8 shrink-0">
-            <AvatarFallback className="font-departure-mono text-xs">U</AvatarFallback>
-          </Avatar>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn("ml-auto shrink-0 border-0 shadow-none hover:bg-transparent", isCollapsed && "ml-0 w-full justify-center")}
-            asChild
-          >
-            <Link href="/settings" onClick={onLinkClick} title={isCollapsed ? "Settings" : undefined}>
-              <Settings className="h-4 w-4" />
-            </Link>
-          </Button>
+      <div className={cn("shrink-0 p-4", isCollapsed && "p-2")}>
+        <div className={cn(isCollapsed && "flex justify-center")}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "h-8 w-8 rounded-full p-0 border-0 shadow-none hover:bg-transparent",
+                  isCollapsed && "w-8"
+                )}
+                aria-label="Profile menu"
+              >
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarFallback className="font-departure-mono text-xs">U</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={isCollapsed ? "center" : "start"} side="top" className="font-departure-mono">
+              <DropdownMenuItem asChild>
+                <Link href="/settings" onClick={onLinkClick}>
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
+                <DropdownMenuRadioItem value="light" className="gap-2">
+                  <Sun className="h-4 w-4 shrink-0" />
+                  Light
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark" className="gap-2">
+                  <Moon className="h-4 w-4 shrink-0" />
+                  Dark
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system" className="gap-2">
+                  <Monitor className="h-4 w-4 shrink-0" />
+                  System
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
