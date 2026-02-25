@@ -93,6 +93,205 @@ const COUNTRY_PHONE_CODES: Record<string, string> = {
   "Venezuela": "+58", "Vietnam": "+84", "Yemen": "+967", "Zambia": "+260", "Zimbabwe": "+263",
 };
 
+const DEFAULT_PHONE_SEGMENTS = [3, 3, 4];
+
+const COUNTRY_PHONE_FORMATS: Record<string, { code: string; segments: number[] }> = {
+  "Afghanistan": { code: "+93", segments: [2, 3, 4] },
+  "Albania": { code: "+355", segments: [2, 3, 4] },
+  "Algeria": { code: "+213", segments: [2, 3, 4] },
+  "Andorra": { code: "+376", segments: [3, 3] },
+  "Angola": { code: "+244", segments: [3, 3, 3] },
+  "Antigua and Barbuda": { code: "+1-268", segments: [3, 3, 4] },
+  "Argentina": { code: "+54", segments: [2, 4, 4] },
+  "Armenia": { code: "+374", segments: [2, 3, 3] },
+  "Australia": { code: "+61", segments: [1, 4, 4] },
+  "Austria": { code: "+43", segments: [3, 7] },
+  "Azerbaijan": { code: "+994", segments: [2, 3, 4] },
+  "Bahamas": { code: "+1-242", segments: [3, 3, 4] },
+  "Bahrain": { code: "+973", segments: [4, 4] },
+  "Bangladesh": { code: "+880", segments: [4, 6] },
+  "Barbados": { code: "+1-246", segments: [3, 3, 4] },
+  "Belarus": { code: "+375", segments: [2, 3, 4] },
+  "Belgium": { code: "+32", segments: [3, 2, 2, 2] },
+  "Belize": { code: "+501", segments: [3, 4] },
+  "Benin": { code: "+229", segments: [2, 2, 2, 2] },
+  "Bhutan": { code: "+975", segments: [1, 3, 4] },
+  "Bolivia": { code: "+591", segments: [1, 3, 4] },
+  "Bosnia and Herzegovina": { code: "+387", segments: [2, 3, 3] },
+  "Botswana": { code: "+267", segments: [2, 3, 3] },
+  "Brazil": { code: "+55", segments: [2, 5, 4] },
+  "Brunei": { code: "+673", segments: [3, 4] },
+  "Bulgaria": { code: "+359", segments: [2, 3, 4] },
+  "Burkina Faso": { code: "+226", segments: [2, 2, 2, 2] },
+  "Burundi": { code: "+257", segments: [2, 2, 4] },
+  "Cabo Verde": { code: "+238", segments: [3, 4] },
+  "Cambodia": { code: "+855", segments: [2, 3, 4] },
+  "Cameroon": { code: "+237", segments: [4, 5] },
+  "Canada": { code: "+1", segments: [3, 3, 4] },
+  "Central African Republic": { code: "+236", segments: [2, 2, 2, 2] },
+  "Chad": { code: "+235", segments: [2, 2, 2, 2] },
+  "Chile": { code: "+56", segments: [1, 4, 4] },
+  "China": { code: "+86", segments: [3, 4, 4] },
+  "Colombia": { code: "+57", segments: [3, 3, 4] },
+  "Comoros": { code: "+269", segments: [3, 4] },
+  "Congo (Republic of the)": { code: "+242", segments: [2, 3, 4] },
+  "Costa Rica": { code: "+506", segments: [4, 4] },
+  "Côte d'Ivoire": { code: "+225", segments: [2, 2, 2, 4] },
+  "Croatia": { code: "+385", segments: [2, 3, 4] },
+  "Cuba": { code: "+53", segments: [1, 3, 4] },
+  "Cyprus": { code: "+357", segments: [2, 3, 3] },
+  "Czechia": { code: "+420", segments: [3, 3, 3] },
+  "Democratic Republic of the Congo": { code: "+243", segments: [3, 3, 3] },
+  "Denmark": { code: "+45", segments: [4, 4] },
+  "Djibouti": { code: "+253", segments: [2, 2, 2, 2] },
+  "Dominica": { code: "+1-767", segments: [3, 3, 4] },
+  "Dominican Republic": { code: "+1-809", segments: [3, 3, 4] },
+  "Ecuador": { code: "+593", segments: [2, 3, 4] },
+  "Egypt": { code: "+20", segments: [3, 3, 4] },
+  "El Salvador": { code: "+503", segments: [4, 4] },
+  "Equatorial Guinea": { code: "+240", segments: [3, 3, 3] },
+  "Eritrea": { code: "+291", segments: [1, 3, 3] },
+  "Estonia": { code: "+372", segments: [4, 4] },
+  "Eswatini": { code: "+268", segments: [4, 4] },
+  "Ethiopia": { code: "+251", segments: [2, 3, 4] },
+  "Fiji": { code: "+679", segments: [3, 4] },
+  "Finland": { code: "+358", segments: [2, 3, 4] },
+  "France": { code: "+33", segments: [1, 2, 2, 2, 2] },
+  "Gabon": { code: "+241", segments: [1, 2, 2, 2] },
+  "Gambia": { code: "+220", segments: [3, 4] },
+  "Georgia": { code: "+995", segments: [3, 3, 3] },
+  "Germany": { code: "+49", segments: [4, 7] },
+  "Ghana": { code: "+233", segments: [2, 3, 4] },
+  "Greece": { code: "+30", segments: [3, 3, 4] },
+  "Grenada": { code: "+1-473", segments: [3, 3, 4] },
+  "Guatemala": { code: "+502", segments: [4, 4] },
+  "Guinea": { code: "+224", segments: [3, 3, 3] },
+  "Guinea-Bissau": { code: "+245", segments: [3, 4] },
+  "Guyana": { code: "+592", segments: [3, 4] },
+  "Haiti": { code: "+509", segments: [4, 4] },
+  "Honduras": { code: "+504", segments: [4, 4] },
+  "Hungary": { code: "+36", segments: [2, 3, 4] },
+  "Iceland": { code: "+354", segments: [3, 4] },
+  "India": { code: "+91", segments: [5, 5] },
+  "Indonesia": { code: "+62", segments: [3, 4, 4] },
+  "Iran": { code: "+98", segments: [3, 3, 4] },
+  "Iraq": { code: "+964", segments: [3, 3, 4] },
+  "Ireland": { code: "+353", segments: [2, 3, 4] },
+  "Israel": { code: "+972", segments: [2, 3, 4] },
+  "Italy": { code: "+39", segments: [3, 3, 4] },
+  "Jamaica": { code: "+1-876", segments: [3, 3, 4] },
+  "Japan": { code: "+81", segments: [3, 4, 4] },
+  "Jordan": { code: "+962", segments: [1, 4, 4] },
+  "Kazakhstan": { code: "+7", segments: [3, 3, 4] },
+  "Kenya": { code: "+254", segments: [3, 3, 3] },
+  "Kiribati": { code: "+686", segments: [4, 4] },
+  "Kuwait": { code: "+965", segments: [4, 4] },
+  "Kyrgyzstan": { code: "+996", segments: [3, 3, 3] },
+  "Laos": { code: "+856", segments: [2, 3, 4] },
+  "Latvia": { code: "+371", segments: [4, 4] },
+  "Lebanon": { code: "+961", segments: [1, 3, 4] },
+  "Lesotho": { code: "+266", segments: [4, 4] },
+  "Liberia": { code: "+231", segments: [3, 3, 4] },
+  "Libya": { code: "+218", segments: [2, 3, 4] },
+  "Liechtenstein": { code: "+423", segments: [3, 4] },
+  "Lithuania": { code: "+370", segments: [3, 5] },
+  "Luxembourg": { code: "+352", segments: [3, 3, 3] },
+  "Madagascar": { code: "+261", segments: [2, 2, 3, 2] },
+  "Malawi": { code: "+265", segments: [1, 4, 4] },
+  "Malaysia": { code: "+60", segments: [2, 4, 4] },
+  "Maldives": { code: "+960", segments: [3, 4] },
+  "Mali": { code: "+223", segments: [4, 4] },
+  "Malta": { code: "+356", segments: [4, 4] },
+  "Marshall Islands": { code: "+692", segments: [3, 4] },
+  "Mauritania": { code: "+222", segments: [4, 4] },
+  "Mauritius": { code: "+230", segments: [4, 4] },
+  "Mexico": { code: "+52", segments: [3, 3, 4] },
+  "Micronesia": { code: "+691", segments: [3, 4] },
+  "Moldova": { code: "+373", segments: [2, 3, 3] },
+  "Monaco": { code: "+377", segments: [4, 5] },
+  "Mongolia": { code: "+976", segments: [4, 4] },
+  "Montenegro": { code: "+382", segments: [2, 3, 3] },
+  "Morocco": { code: "+212", segments: [2, 3, 4] },
+  "Mozambique": { code: "+258", segments: [2, 3, 4] },
+  "Myanmar": { code: "+95", segments: [1, 3, 5] },
+  "Namibia": { code: "+264", segments: [2, 3, 4] },
+  "Nauru": { code: "+674", segments: [3, 4] },
+  "Nepal": { code: "+977", segments: [3, 3, 4] },
+  "Netherlands": { code: "+31", segments: [2, 3, 4] },
+  "New Zealand": { code: "+64", segments: [2, 3, 4] },
+  "Nicaragua": { code: "+505", segments: [4, 4] },
+  "Niger": { code: "+227", segments: [4, 4] },
+  "Nigeria": { code: "+234", segments: [3, 3, 4] },
+  "North Korea": { code: "+850", segments: [4, 3, 4] },
+  "North Macedonia": { code: "+389", segments: [2, 3, 3] },
+  "Norway": { code: "+47", segments: [4, 4] },
+  "Oman": { code: "+968", segments: [4, 4] },
+  "Pakistan": { code: "+92", segments: [3, 3, 4] },
+  "Palau": { code: "+680", segments: [3, 4] },
+  "Palestine": { code: "+970", segments: [2, 3, 4] },
+  "Panama": { code: "+507", segments: [4, 4] },
+  "Papua New Guinea": { code: "+675", segments: [4, 4] },
+  "Paraguay": { code: "+595", segments: [3, 3, 3] },
+  "Peru": { code: "+51", segments: [3, 3, 3] },
+  "Philippines": { code: "+63", segments: [3, 3, 4] },
+  "Poland": { code: "+48", segments: [3, 3, 3] },
+  "Portugal": { code: "+351", segments: [3, 3, 3] },
+  "Qatar": { code: "+974", segments: [4, 4] },
+  "Romania": { code: "+40", segments: [3, 3, 3] },
+  "Russia": { code: "+7", segments: [3, 3, 4] },
+  "Rwanda": { code: "+250", segments: [3, 3, 3] },
+  "Saint Kitts and Nevis": { code: "+1-869", segments: [3, 3, 4] },
+  "Saint Lucia": { code: "+1-758", segments: [3, 3, 4] },
+  "Saint Vincent and the Grenadines": { code: "+1-784", segments: [3, 3, 4] },
+  "Samoa": { code: "+685", segments: [2, 5] },
+  "San Marino": { code: "+378", segments: [4, 6] },
+  "São Tomé and Príncipe": { code: "+239", segments: [3, 4] },
+  "Saudi Arabia": { code: "+966", segments: [2, 3, 4] },
+  "Senegal": { code: "+221", segments: [2, 3, 4] },
+  "Serbia": { code: "+381", segments: [2, 3, 4] },
+  "Seychelles": { code: "+248", segments: [1, 2, 4] },
+  "Sierra Leone": { code: "+232", segments: [2, 3, 3] },
+  "Singapore": { code: "+65", segments: [4, 4] },
+  "Slovakia": { code: "+421", segments: [3, 3, 3] },
+  "Slovenia": { code: "+386", segments: [2, 3, 3] },
+  "Solomon Islands": { code: "+677", segments: [3, 4] },
+  "Somalia": { code: "+252", segments: [2, 3, 4] },
+  "South Africa": { code: "+27", segments: [2, 3, 4] },
+  "South Korea": { code: "+82", segments: [2, 4, 4] },
+  "South Sudan": { code: "+211", segments: [3, 3, 3] },
+  "Spain": { code: "+34", segments: [3, 3, 3] },
+  "Sri Lanka": { code: "+94", segments: [2, 3, 4] },
+  "Sudan": { code: "+249", segments: [2, 3, 4] },
+  "Suriname": { code: "+597", segments: [3, 4] },
+  "Sweden": { code: "+46", segments: [2, 3, 4] },
+  "Switzerland": { code: "+41", segments: [2, 3, 4] },
+  "Syria": { code: "+963", segments: [3, 3, 3] },
+  "Tajikistan": { code: "+992", segments: [3, 3, 3] },
+  "Tanzania": { code: "+255", segments: [3, 3, 3] },
+  "Thailand": { code: "+66", segments: [1, 4, 4] },
+  "Timor-Leste": { code: "+670", segments: [4, 4] },
+  "Togo": { code: "+228", segments: [2, 2, 2, 2] },
+  "Tonga": { code: "+676", segments: [3, 4] },
+  "Trinidad and Tobago": { code: "+1-868", segments: [3, 3, 4] },
+  "Tunisia": { code: "+216", segments: [2, 3, 3] },
+  "Türkiye": { code: "+90", segments: [3, 3, 4] },
+  "Turkmenistan": { code: "+993", segments: [2, 5] },
+  "Tuvalu": { code: "+688", segments: [2, 4] },
+  "Uganda": { code: "+256", segments: [3, 3, 3] },
+  "Ukraine": { code: "+380", segments: [2, 3, 4] },
+  "United Arab Emirates": { code: "+971", segments: [2, 3, 4] },
+  "United Kingdom": { code: "+44", segments: [4, 6] },
+  "United States": { code: "+1", segments: [3, 3, 4] },
+  "Uruguay": { code: "+598", segments: [1, 3, 4] },
+  "Uzbekistan": { code: "+998", segments: [2, 3, 4] },
+  "Vanuatu": { code: "+678", segments: [3, 4] },
+  "Venezuela": { code: "+58", segments: [3, 3, 4] },
+  "Vietnam": { code: "+84", segments: [3, 3, 4] },
+  "Yemen": { code: "+967", segments: [3, 3, 3] },
+  "Zambia": { code: "+260", segments: [2, 3, 4] },
+  "Zimbabwe": { code: "+263", segments: [2, 3, 4] },
+};
+
 const PERSONALITY_OPTIONS = [
   { group: "🧠 Analysts", items: [
     { id: "INTJ", title: "Architect", desc: "Plans a hyper-efficient, optimized itinerary months in advance and quietly experiences each destination with strategic precision." },
@@ -143,15 +342,30 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const [baseCountry, setBaseCountry] = useState<string | null>(null);
   const [baseCountryOpen, setBaseCountryOpen] = useState(false);
   const [phoneCode, setPhoneCode] = useState("");
-  const [phonePart1, setPhonePart1] = useState("");
-  const [phonePart2, setPhonePart2] = useState("");
-  const [phonePart3, setPhonePart3] = useState("");
+  const [phoneParts, setPhoneParts] = useState<string[]>([]);
+
+  const phoneSegments = baseCountry && COUNTRY_PHONE_FORMATS[baseCountry]
+    ? COUNTRY_PHONE_FORMATS[baseCountry].segments
+    : DEFAULT_PHONE_SEGMENTS;
 
   useEffect(() => {
-    if (baseCountry && COUNTRY_PHONE_CODES[baseCountry]) {
+    if (baseCountry && COUNTRY_PHONE_FORMATS[baseCountry]) {
+      const { code, segments } = COUNTRY_PHONE_FORMATS[baseCountry];
+      setPhoneCode(code);
+      setPhoneParts(segments.map(() => ""));
+    } else if (baseCountry && COUNTRY_PHONE_CODES[baseCountry]) {
       setPhoneCode(COUNTRY_PHONE_CODES[baseCountry]);
+      setPhoneParts(DEFAULT_PHONE_SEGMENTS.map(() => ""));
     }
   }, [baseCountry]);
+
+  const setPhonePart = (index: number, value: string) => {
+    setPhoneParts((prev) => {
+      const next = [...(prev.length >= phoneSegments.length ? prev : phoneSegments.map(() => ""))];
+      next[index] = value.replace(/\D/g, "").slice(0, phoneSegments[index]);
+      return next;
+    });
+  };
 
   const passwordValid = !password || PASSWORD_REGEX.test(password);
 
@@ -281,37 +495,27 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Phone number</Label>
-                      <div className="flex gap-2 items-center">
+                      <div className="flex flex-wrap gap-2 items-center">
                         <Input
                           value={phoneCode}
                           onChange={(e) => setPhoneCode(e.target.value)}
                           placeholder="+1"
                           className="w-24 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold shrink-0"
                         />
-                        <Input
-                          value={phonePart1}
-                          onChange={(e) => setPhonePart1(e.target.value.replace(/\D/g, "").slice(0, 3))}
-                          placeholder="555"
-                          type="tel"
-                          maxLength={3}
-                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
-                        />
-                        <Input
-                          value={phonePart2}
-                          onChange={(e) => setPhonePart2(e.target.value.replace(/\D/g, "").slice(0, 3))}
-                          placeholder="123"
-                          type="tel"
-                          maxLength={3}
-                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
-                        />
-                        <Input
-                          value={phonePart3}
-                          onChange={(e) => setPhonePart3(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                          placeholder="4567"
-                          type="tel"
-                          maxLength={4}
-                          className="w-16 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
-                        />
+                        {phoneSegments.map((len, i) => (
+                          <Input
+                            key={i}
+                            value={phoneParts[i] ?? ""}
+                            onChange={(e) => setPhonePart(i, e.target.value)}
+                            placeholder={"X".repeat(len)}
+                            type="tel"
+                            maxLength={len}
+                            className={cn(
+                              "font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center",
+                              len <= 2 ? "w-10" : len <= 4 ? "w-14" : len <= 5 ? "w-16" : "w-20"
+                            )}
+                          />
+                        ))}
                       </div>
                     </div>
                     <div className="space-y-1.5">
