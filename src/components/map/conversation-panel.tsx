@@ -21,8 +21,8 @@ export function ConversationPanel({ className }: { className?: string }) {
           className
         )}
       >
-        <p className="font-fenix text-xl text-muted-foreground mb-6">
-          Where do you want to go?
+        <p className="font-fenix text-xl text-white mb-6">
+        Explore, plan, or book trips - anytime & anywhere
         </p>
         <div className="w-full max-w-2xl">
           <ChatInput onSend={handleSend} />

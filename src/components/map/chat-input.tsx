@@ -12,16 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArrowUp, Compass, Map, CreditCard, ChevronDown, Square } from "lucide-react"
-import { useEffect, useState } from "react"
-
-const PLACEHOLDERS = [
-  "Plan a 5-day Italy trip in September",
-  "Things to do in Lisbon in April",
-  "Find flights NYC → Tokyo next month",
-  "Weekend trip ideas from Chicago",
-  "Book a hotel in Barcelona in May",
-]
+import { Compass, Map, CreditCard, ChevronDown, Square, Telescope, Notebook, Receipt } from "lucide-react"
+import { useState } from "react"
 
 type ChatMode = "explore" | "plan" | "book"
 
@@ -31,15 +23,24 @@ const MODE_LABELS: Record<ChatMode, string> = {
   book: "Book",
 }
 
+const MODE_PLACEHOLDERS: Record<ChatMode, string> = {
+  explore: "Where do you want to go next?",
+  plan: "What do you want to do when you reach there?",
+  book: "How do you want to get there?",
+} as const
+
+const MODE_SUBMIT_ICONS: Record<ChatMode, typeof Telescope> = {
+  explore: Telescope,
+  plan: Notebook,
+  book: Receipt,
+}
+
 export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [placeholder, setPlaceholder] = useState(PLACEHOLDERS[0])
   const [mode, setMode] = useState<ChatMode>("explore")
 
-  useEffect(() => {
-    setPlaceholder(PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)])
-  }, [])
+  const placeholder = MODE_PLACEHOLDERS[mode]
 
   const handleSubmit = () => {
     if (input.trim()) {
@@ -51,6 +52,8 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
       }, 500)
     }
   }
+
+  const SubmitIcon = MODE_SUBMIT_ICONS[mode]
 
   return (
     <PromptInput
@@ -78,22 +81,51 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="font-departure-mono">
-            <DropdownMenuItem onClick={() => setMode("explore")}>
+            <DropdownMenuItem
+              onClick={() => {
+                setMode("explore")
+                setInput("")
+              }}
+            >
               <Compass className="size-4" />
               Explore
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setMode("plan")}>
+            <DropdownMenuItem
+              onClick={() => {
+                setMode("plan")
+                setInput("")
+              }}
+            >
               <Map className="size-4" />
               Plan
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setMode("book")}>
+            <DropdownMenuItem
+              onClick={() => {
+                setMode("book")
+                setInput("")
+              }}
+            >
               <CreditCard className="size-4" />
               Book
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <PromptInputTextarea placeholder={placeholder} className="min-h-0 py-0 flex-1" />
+        <div className="relative min-h-[24px] min-w-0 flex-1 flex">
+          <PromptInputTextarea
+            placeholder=""
+            className="min-h-[24px] min-w-0 flex-1 py-0 bg-transparent"
+          />
+          {!input && (
+            <div
+              key={mode}
+              className="pointer-events-none absolute inset-0 z-10 flex items-center px-2 py-1 text-base text-muted-foreground md:text-sm font-wenkai-mono-bold select-none animate-icon-mode-change"
+              aria-hidden
+            >
+              {placeholder}
+            </div>
+          )}
+        </div>
 
         <PromptInputAction
           tooltip={isLoading ? "Stop generation" : "Send message"}
@@ -107,7 +139,9 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             {isLoading ? (
               <Square className="size-4 fill-current" />
             ) : (
-              <ArrowUp className="size-4" />
+              <span key={mode} className="inline-flex">
+                <SubmitIcon className="size-4 animate-icon-mode-change" />
+              </span>
             )}
           </Button>
         </PromptInputAction>

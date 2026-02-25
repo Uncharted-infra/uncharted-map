@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import {
   Search,
   Map,
-  Users,
   Briefcase,
   Settings,
   Menu,
@@ -23,6 +22,7 @@ import {
   Building2,
   Plane,
   Activity,
+  FileText,
 } from "lucide-react";
 import { useSidebar } from "@/contexts/sidebar-context";
 import { PassportIcon } from "@/components/icons/passport-icon";
@@ -49,7 +49,7 @@ const luggageItems = [
   { icon: Plane, label: "Flights", href: "/luggage/flights" },
 ] as const;
 
-const passportItems = [
+const documentItems = [
   { icon: Plane, label: "Flights", href: "/passport/flights" },
   { icon: Building2, label: "Hotels", href: "/passport/hotels" },
   { icon: Activity, label: "Activities", href: "/passport/activities" },
@@ -65,7 +65,7 @@ function SidebarContent({
   const isCollapsed = forceExpanded ? false : collapsed;
   const [tripsOpen, setTripsOpen] = useState(false);
   const [luggageOpen, setLuggageOpen] = useState(false);
-  const [passportOpen, setPassportOpen] = useState(false);
+  const [documentsOpen, setDocumentsOpen] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -154,9 +154,9 @@ function SidebarContent({
             )}
             asChild
           >
-            <Link href="/friends" onClick={onLinkClick} title={isCollapsed ? "Friends" : undefined}>
-              <Users className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Friends"}
+            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
+              <PassportIcon />
+              {!isCollapsed && "Passport"}
             </Link>
           </Button>
 
@@ -260,29 +260,29 @@ function SidebarContent({
                 "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
                 isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
               )}
-              title={isCollapsed ? "Passport" : undefined}
+              title={isCollapsed ? "Documents" : undefined}
               onClick={() => {
                 if (isCollapsed) {
                   toggleCollapsed();
-                  setPassportOpen(true);
+                  setDocumentsOpen(true);
                 } else {
-                  setPassportOpen((o) => !o);
+                  setDocumentsOpen((o) => !o);
                 }
               }}
             >
-              <PassportIcon />
+              <FileText className="h-4 w-4 shrink-0" />
               {!isCollapsed && (
                 <>
-                  <span className="flex-1 text-left">Passport</span>
+                  <span className="flex-1 text-left">Documents</span>
                   <ChevronDown
-                    className={cn("h-4 w-4 shrink-0 transition-transform", passportOpen && "rotate-180")}
+                    className={cn("h-4 w-4 shrink-0 transition-transform", documentsOpen && "rotate-180")}
                   />
                 </>
               )}
             </Button>
-            {!isCollapsed && passportOpen && (
+            {!isCollapsed && documentsOpen && (
               <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
-                {passportItems.map((item) => (
+                {documentItems.map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}

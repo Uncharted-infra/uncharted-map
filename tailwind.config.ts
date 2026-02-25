@@ -49,11 +49,22 @@ const config: Config = {
   				'100%': {
   					transform: 'translateX(0)'
   				}
+  			},
+  			'icon-mode-change': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(4px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
   			}
   		},
   		animation: {
   			'fade-slide-up': 'fade-slide-up 0.3s ease-out',
-  			'slide-in-right': 'slide-in-right 0.3s ease-out'
+  			'slide-in-right': 'slide-in-right 0.3s ease-out',
+  			'icon-mode-change': 'icon-mode-change 0.25s ease-out'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
