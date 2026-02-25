@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Plane, Hotel, Calendar, CheckCircle } from "lucide-react";
+import { MapPin, Plane, Hotel, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

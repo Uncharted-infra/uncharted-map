@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,284 +9,14 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { User, Plane, Coins, Plug, Bell, ChevronDown, Check, Save, Trash2 } from "lucide-react";
 import { PassportIcon } from "@/components/icons/passport-icon";
 import { cn } from "@/lib/utils";
+import { COUNTRIES, COUNTRY_PHONE_FORMATS, DEFAULT_PHONE_SEGMENTS } from "@/data/countries";
+import { TRAVEL_FIELDS, INTEGRATIONS, NOTIFICATION_ITEMS } from "@/data/settings";
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
-
-const COUNTRIES = [
-  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
-  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-  "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Republic of the)", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czechia",
-  "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
-  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
-  "Fiji", "Finland", "France",
-  "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-  "Haiti", "Honduras", "Hungary",
-  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
-  "Jamaica", "Japan", "Jordan",
-  "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
-  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
-  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
-  "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
-  "Oman",
-  "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
-  "Qatar",
-  "Romania", "Russia", "Rwanda",
-  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "São Tomé and Príncipe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-  "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Türkiye", "Turkmenistan", "Tuvalu",
-  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
-  "Vanuatu", "Venezuela", "Vietnam",
-  "Yemen",
-  "Zambia", "Zimbabwe",
-];
-
-const COUNTRY_PHONE_CODES: Record<string, string> = {
-  "Afghanistan": "+93", "Albania": "+355", "Algeria": "+213", "Andorra": "+376", "Angola": "+244",
-  "Antigua and Barbuda": "+1-268", "Argentina": "+54", "Armenia": "+374", "Australia": "+61", "Austria": "+43",
-  "Azerbaijan": "+994", "Bahamas": "+1-242", "Bahrain": "+973", "Bangladesh": "+880", "Barbados": "+1-246",
-  "Belarus": "+375", "Belgium": "+32", "Belize": "+501", "Benin": "+229", "Bhutan": "+975", "Bolivia": "+591",
-  "Bosnia and Herzegovina": "+387", "Botswana": "+267", "Brazil": "+55", "Brunei": "+673", "Bulgaria": "+359",
-  "Burkina Faso": "+226", "Burundi": "+257", "Cabo Verde": "+238", "Cambodia": "+855", "Cameroon": "+237",
-  "Canada": "+1", "Central African Republic": "+236", "Chad": "+235", "Chile": "+56", "China": "+86",
-  "Colombia": "+57", "Comoros": "+269", "Congo (Republic of the)": "+242", "Costa Rica": "+506",
-  "Côte d'Ivoire": "+225", "Croatia": "+385", "Cuba": "+53", "Cyprus": "+357", "Czechia": "+420",
-  "Democratic Republic of the Congo": "+243", "Denmark": "+45", "Djibouti": "+253", "Dominica": "+1-767",
-  "Dominican Republic": "+1-809", "Ecuador": "+593", "Egypt": "+20", "El Salvador": "+503",
-  "Equatorial Guinea": "+240", "Eritrea": "+291", "Estonia": "+372", "Eswatini": "+268", "Ethiopia": "+251",
-  "Fiji": "+679", "Finland": "+358", "France": "+33", "Gabon": "+241", "Gambia": "+220", "Georgia": "+995",
-  "Germany": "+49", "Ghana": "+233", "Greece": "+30", "Grenada": "+1-473", "Guatemala": "+502", "Guinea": "+224",
-  "Guinea-Bissau": "+245", "Guyana": "+592", "Haiti": "+509", "Honduras": "+504", "Hungary": "+36",
-  "Iceland": "+354", "India": "+91", "Indonesia": "+62", "Iran": "+98", "Iraq": "+964", "Ireland": "+353",
-  "Israel": "+972", "Italy": "+39", "Jamaica": "+1-876", "Japan": "+81", "Jordan": "+962",
-  "Kazakhstan": "+7", "Kenya": "+254", "Kiribati": "+686", "Kuwait": "+965", "Kyrgyzstan": "+996",
-  "Laos": "+856", "Latvia": "+371", "Lebanon": "+961", "Lesotho": "+266", "Liberia": "+231", "Libya": "+218",
-  "Liechtenstein": "+423", "Lithuania": "+370", "Luxembourg": "+352", "Madagascar": "+261", "Malawi": "+265",
-  "Malaysia": "+60", "Maldives": "+960", "Mali": "+223", "Malta": "+356", "Marshall Islands": "+692",
-  "Mauritania": "+222", "Mauritius": "+230", "Mexico": "+52", "Micronesia": "+691", "Moldova": "+373",
-  "Monaco": "+377", "Mongolia": "+976", "Montenegro": "+382", "Morocco": "+212", "Mozambique": "+258",
-  "Myanmar": "+95", "Namibia": "+264", "Nauru": "+674", "Nepal": "+977", "Netherlands": "+31",
-  "New Zealand": "+64", "Nicaragua": "+505", "Niger": "+227", "Nigeria": "+234", "North Korea": "+850",
-  "North Macedonia": "+389", "Norway": "+47", "Oman": "+968", "Pakistan": "+92", "Palau": "+680",
-  "Palestine": "+970", "Panama": "+507", "Papua New Guinea": "+675", "Paraguay": "+595", "Peru": "+51",
-  "Philippines": "+63", "Poland": "+48", "Portugal": "+351", "Qatar": "+974", "Romania": "+40",
-  "Russia": "+7", "Rwanda": "+250", "Saint Kitts and Nevis": "+1-869", "Saint Lucia": "+1-758",
-  "Saint Vincent and the Grenadines": "+1-784", "Samoa": "+685", "San Marino": "+378",
-  "São Tomé and Príncipe": "+239", "Saudi Arabia": "+966", "Senegal": "+221", "Serbia": "+381",
-  "Seychelles": "+248", "Sierra Leone": "+232", "Singapore": "+65", "Slovakia": "+421", "Slovenia": "+386",
-  "Solomon Islands": "+677", "Somalia": "+252", "South Africa": "+27", "South Korea": "+82", "South Sudan": "+211",
-  "Spain": "+34", "Sri Lanka": "+94", "Sudan": "+249", "Suriname": "+597", "Sweden": "+46", "Switzerland": "+41",
-  "Syria": "+963", "Tajikistan": "+992", "Tanzania": "+255", "Thailand": "+66", "Timor-Leste": "+670",
-  "Togo": "+228", "Tonga": "+676", "Trinidad and Tobago": "+1-868", "Tunisia": "+216", "Türkiye": "+90",
-  "Turkmenistan": "+993", "Tuvalu": "+688", "Uganda": "+256", "Ukraine": "+380", "United Arab Emirates": "+971",
-  "United Kingdom": "+44", "United States": "+1", "Uruguay": "+598", "Uzbekistan": "+998", "Vanuatu": "+678",
-  "Venezuela": "+58", "Vietnam": "+84", "Yemen": "+967", "Zambia": "+260", "Zimbabwe": "+263",
-};
-
-const DEFAULT_PHONE_SEGMENTS = [3, 3, 4];
-
-const COUNTRY_PHONE_FORMATS: Record<string, { code: string; segments: number[] }> = {
-  "Afghanistan": { code: "+93", segments: [2, 3, 4] },
-  "Albania": { code: "+355", segments: [2, 3, 4] },
-  "Algeria": { code: "+213", segments: [2, 3, 4] },
-  "Andorra": { code: "+376", segments: [3, 3] },
-  "Angola": { code: "+244", segments: [3, 3, 3] },
-  "Antigua and Barbuda": { code: "+1-268", segments: [3, 3, 4] },
-  "Argentina": { code: "+54", segments: [2, 4, 4] },
-  "Armenia": { code: "+374", segments: [2, 3, 3] },
-  "Australia": { code: "+61", segments: [1, 4, 4] },
-  "Austria": { code: "+43", segments: [3, 7] },
-  "Azerbaijan": { code: "+994", segments: [2, 3, 4] },
-  "Bahamas": { code: "+1-242", segments: [3, 3, 4] },
-  "Bahrain": { code: "+973", segments: [4, 4] },
-  "Bangladesh": { code: "+880", segments: [4, 6] },
-  "Barbados": { code: "+1-246", segments: [3, 3, 4] },
-  "Belarus": { code: "+375", segments: [2, 3, 4] },
-  "Belgium": { code: "+32", segments: [3, 2, 2, 2] },
-  "Belize": { code: "+501", segments: [3, 4] },
-  "Benin": { code: "+229", segments: [2, 2, 2, 2] },
-  "Bhutan": { code: "+975", segments: [1, 3, 4] },
-  "Bolivia": { code: "+591", segments: [1, 3, 4] },
-  "Bosnia and Herzegovina": { code: "+387", segments: [2, 3, 3] },
-  "Botswana": { code: "+267", segments: [2, 3, 3] },
-  "Brazil": { code: "+55", segments: [2, 5, 4] },
-  "Brunei": { code: "+673", segments: [3, 4] },
-  "Bulgaria": { code: "+359", segments: [2, 3, 4] },
-  "Burkina Faso": { code: "+226", segments: [2, 2, 2, 2] },
-  "Burundi": { code: "+257", segments: [2, 2, 4] },
-  "Cabo Verde": { code: "+238", segments: [3, 4] },
-  "Cambodia": { code: "+855", segments: [2, 3, 4] },
-  "Cameroon": { code: "+237", segments: [4, 5] },
-  "Canada": { code: "+1", segments: [3, 3, 4] },
-  "Central African Republic": { code: "+236", segments: [2, 2, 2, 2] },
-  "Chad": { code: "+235", segments: [2, 2, 2, 2] },
-  "Chile": { code: "+56", segments: [1, 4, 4] },
-  "China": { code: "+86", segments: [3, 4, 4] },
-  "Colombia": { code: "+57", segments: [3, 3, 4] },
-  "Comoros": { code: "+269", segments: [3, 4] },
-  "Congo (Republic of the)": { code: "+242", segments: [2, 3, 4] },
-  "Costa Rica": { code: "+506", segments: [4, 4] },
-  "Côte d'Ivoire": { code: "+225", segments: [2, 2, 2, 4] },
-  "Croatia": { code: "+385", segments: [2, 3, 4] },
-  "Cuba": { code: "+53", segments: [1, 3, 4] },
-  "Cyprus": { code: "+357", segments: [2, 3, 3] },
-  "Czechia": { code: "+420", segments: [3, 3, 3] },
-  "Democratic Republic of the Congo": { code: "+243", segments: [3, 3, 3] },
-  "Denmark": { code: "+45", segments: [4, 4] },
-  "Djibouti": { code: "+253", segments: [2, 2, 2, 2] },
-  "Dominica": { code: "+1-767", segments: [3, 3, 4] },
-  "Dominican Republic": { code: "+1-809", segments: [3, 3, 4] },
-  "Ecuador": { code: "+593", segments: [2, 3, 4] },
-  "Egypt": { code: "+20", segments: [3, 3, 4] },
-  "El Salvador": { code: "+503", segments: [4, 4] },
-  "Equatorial Guinea": { code: "+240", segments: [3, 3, 3] },
-  "Eritrea": { code: "+291", segments: [1, 3, 3] },
-  "Estonia": { code: "+372", segments: [4, 4] },
-  "Eswatini": { code: "+268", segments: [4, 4] },
-  "Ethiopia": { code: "+251", segments: [2, 3, 4] },
-  "Fiji": { code: "+679", segments: [3, 4] },
-  "Finland": { code: "+358", segments: [2, 3, 4] },
-  "France": { code: "+33", segments: [1, 2, 2, 2, 2] },
-  "Gabon": { code: "+241", segments: [1, 2, 2, 2] },
-  "Gambia": { code: "+220", segments: [3, 4] },
-  "Georgia": { code: "+995", segments: [3, 3, 3] },
-  "Germany": { code: "+49", segments: [4, 7] },
-  "Ghana": { code: "+233", segments: [2, 3, 4] },
-  "Greece": { code: "+30", segments: [3, 3, 4] },
-  "Grenada": { code: "+1-473", segments: [3, 3, 4] },
-  "Guatemala": { code: "+502", segments: [4, 4] },
-  "Guinea": { code: "+224", segments: [3, 3, 3] },
-  "Guinea-Bissau": { code: "+245", segments: [3, 4] },
-  "Guyana": { code: "+592", segments: [3, 4] },
-  "Haiti": { code: "+509", segments: [4, 4] },
-  "Honduras": { code: "+504", segments: [4, 4] },
-  "Hungary": { code: "+36", segments: [2, 3, 4] },
-  "Iceland": { code: "+354", segments: [3, 4] },
-  "India": { code: "+91", segments: [5, 5] },
-  "Indonesia": { code: "+62", segments: [3, 4, 4] },
-  "Iran": { code: "+98", segments: [3, 3, 4] },
-  "Iraq": { code: "+964", segments: [3, 3, 4] },
-  "Ireland": { code: "+353", segments: [2, 3, 4] },
-  "Israel": { code: "+972", segments: [2, 3, 4] },
-  "Italy": { code: "+39", segments: [3, 3, 4] },
-  "Jamaica": { code: "+1-876", segments: [3, 3, 4] },
-  "Japan": { code: "+81", segments: [3, 4, 4] },
-  "Jordan": { code: "+962", segments: [1, 4, 4] },
-  "Kazakhstan": { code: "+7", segments: [3, 3, 4] },
-  "Kenya": { code: "+254", segments: [3, 3, 3] },
-  "Kiribati": { code: "+686", segments: [4, 4] },
-  "Kuwait": { code: "+965", segments: [4, 4] },
-  "Kyrgyzstan": { code: "+996", segments: [3, 3, 3] },
-  "Laos": { code: "+856", segments: [2, 3, 4] },
-  "Latvia": { code: "+371", segments: [4, 4] },
-  "Lebanon": { code: "+961", segments: [1, 3, 4] },
-  "Lesotho": { code: "+266", segments: [4, 4] },
-  "Liberia": { code: "+231", segments: [3, 3, 4] },
-  "Libya": { code: "+218", segments: [2, 3, 4] },
-  "Liechtenstein": { code: "+423", segments: [3, 4] },
-  "Lithuania": { code: "+370", segments: [3, 5] },
-  "Luxembourg": { code: "+352", segments: [3, 3, 3] },
-  "Madagascar": { code: "+261", segments: [2, 2, 3, 2] },
-  "Malawi": { code: "+265", segments: [1, 4, 4] },
-  "Malaysia": { code: "+60", segments: [2, 4, 4] },
-  "Maldives": { code: "+960", segments: [3, 4] },
-  "Mali": { code: "+223", segments: [4, 4] },
-  "Malta": { code: "+356", segments: [4, 4] },
-  "Marshall Islands": { code: "+692", segments: [3, 4] },
-  "Mauritania": { code: "+222", segments: [4, 4] },
-  "Mauritius": { code: "+230", segments: [4, 4] },
-  "Mexico": { code: "+52", segments: [3, 3, 4] },
-  "Micronesia": { code: "+691", segments: [3, 4] },
-  "Moldova": { code: "+373", segments: [2, 3, 3] },
-  "Monaco": { code: "+377", segments: [4, 5] },
-  "Mongolia": { code: "+976", segments: [4, 4] },
-  "Montenegro": { code: "+382", segments: [2, 3, 3] },
-  "Morocco": { code: "+212", segments: [2, 3, 4] },
-  "Mozambique": { code: "+258", segments: [2, 3, 4] },
-  "Myanmar": { code: "+95", segments: [1, 3, 5] },
-  "Namibia": { code: "+264", segments: [2, 3, 4] },
-  "Nauru": { code: "+674", segments: [3, 4] },
-  "Nepal": { code: "+977", segments: [3, 3, 4] },
-  "Netherlands": { code: "+31", segments: [2, 3, 4] },
-  "New Zealand": { code: "+64", segments: [2, 3, 4] },
-  "Nicaragua": { code: "+505", segments: [4, 4] },
-  "Niger": { code: "+227", segments: [4, 4] },
-  "Nigeria": { code: "+234", segments: [3, 3, 4] },
-  "North Korea": { code: "+850", segments: [4, 3, 4] },
-  "North Macedonia": { code: "+389", segments: [2, 3, 3] },
-  "Norway": { code: "+47", segments: [4, 4] },
-  "Oman": { code: "+968", segments: [4, 4] },
-  "Pakistan": { code: "+92", segments: [3, 3, 4] },
-  "Palau": { code: "+680", segments: [3, 4] },
-  "Palestine": { code: "+970", segments: [2, 3, 4] },
-  "Panama": { code: "+507", segments: [4, 4] },
-  "Papua New Guinea": { code: "+675", segments: [4, 4] },
-  "Paraguay": { code: "+595", segments: [3, 3, 3] },
-  "Peru": { code: "+51", segments: [3, 3, 3] },
-  "Philippines": { code: "+63", segments: [3, 3, 4] },
-  "Poland": { code: "+48", segments: [3, 3, 3] },
-  "Portugal": { code: "+351", segments: [3, 3, 3] },
-  "Qatar": { code: "+974", segments: [4, 4] },
-  "Romania": { code: "+40", segments: [3, 3, 3] },
-  "Russia": { code: "+7", segments: [3, 3, 4] },
-  "Rwanda": { code: "+250", segments: [3, 3, 3] },
-  "Saint Kitts and Nevis": { code: "+1-869", segments: [3, 3, 4] },
-  "Saint Lucia": { code: "+1-758", segments: [3, 3, 4] },
-  "Saint Vincent and the Grenadines": { code: "+1-784", segments: [3, 3, 4] },
-  "Samoa": { code: "+685", segments: [2, 5] },
-  "San Marino": { code: "+378", segments: [4, 6] },
-  "São Tomé and Príncipe": { code: "+239", segments: [3, 4] },
-  "Saudi Arabia": { code: "+966", segments: [2, 3, 4] },
-  "Senegal": { code: "+221", segments: [2, 3, 4] },
-  "Serbia": { code: "+381", segments: [2, 3, 4] },
-  "Seychelles": { code: "+248", segments: [1, 2, 4] },
-  "Sierra Leone": { code: "+232", segments: [2, 3, 3] },
-  "Singapore": { code: "+65", segments: [4, 4] },
-  "Slovakia": { code: "+421", segments: [3, 3, 3] },
-  "Slovenia": { code: "+386", segments: [2, 3, 3] },
-  "Solomon Islands": { code: "+677", segments: [3, 4] },
-  "Somalia": { code: "+252", segments: [2, 3, 4] },
-  "South Africa": { code: "+27", segments: [2, 3, 4] },
-  "South Korea": { code: "+82", segments: [2, 4, 4] },
-  "South Sudan": { code: "+211", segments: [3, 3, 3] },
-  "Spain": { code: "+34", segments: [3, 3, 3] },
-  "Sri Lanka": { code: "+94", segments: [2, 3, 4] },
-  "Sudan": { code: "+249", segments: [2, 3, 4] },
-  "Suriname": { code: "+597", segments: [3, 4] },
-  "Sweden": { code: "+46", segments: [2, 3, 4] },
-  "Switzerland": { code: "+41", segments: [2, 3, 4] },
-  "Syria": { code: "+963", segments: [3, 3, 3] },
-  "Tajikistan": { code: "+992", segments: [3, 3, 3] },
-  "Tanzania": { code: "+255", segments: [3, 3, 3] },
-  "Thailand": { code: "+66", segments: [1, 4, 4] },
-  "Timor-Leste": { code: "+670", segments: [4, 4] },
-  "Togo": { code: "+228", segments: [2, 2, 2, 2] },
-  "Tonga": { code: "+676", segments: [3, 4] },
-  "Trinidad and Tobago": { code: "+1-868", segments: [3, 3, 4] },
-  "Tunisia": { code: "+216", segments: [2, 3, 3] },
-  "Türkiye": { code: "+90", segments: [3, 3, 4] },
-  "Turkmenistan": { code: "+993", segments: [2, 5] },
-  "Tuvalu": { code: "+688", segments: [2, 4] },
-  "Uganda": { code: "+256", segments: [3, 3, 3] },
-  "Ukraine": { code: "+380", segments: [2, 3, 4] },
-  "United Arab Emirates": { code: "+971", segments: [2, 3, 4] },
-  "United Kingdom": { code: "+44", segments: [4, 6] },
-  "United States": { code: "+1", segments: [3, 3, 4] },
-  "Uruguay": { code: "+598", segments: [1, 3, 4] },
-  "Uzbekistan": { code: "+998", segments: [2, 3, 4] },
-  "Vanuatu": { code: "+678", segments: [3, 4] },
-  "Venezuela": { code: "+58", segments: [3, 3, 4] },
-  "Vietnam": { code: "+84", segments: [3, 3, 4] },
-  "Yemen": { code: "+967", segments: [3, 3, 3] },
-  "Zambia": { code: "+260", segments: [2, 3, 4] },
-  "Zimbabwe": { code: "+263", segments: [2, 3, 4] },
-};
 
 const PERSONALITY_OPTIONS = [
   { group: "🧠 Analysts", items: [
@@ -349,13 +75,10 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
     : DEFAULT_PHONE_SEGMENTS;
 
   useEffect(() => {
-    if (baseCountry && COUNTRY_PHONE_FORMATS[baseCountry]) {
-      const { code, segments } = COUNTRY_PHONE_FORMATS[baseCountry];
-      setPhoneCode(code);
-      setPhoneParts(segments.map(() => ""));
-    } else if (baseCountry && COUNTRY_PHONE_CODES[baseCountry]) {
-      setPhoneCode(COUNTRY_PHONE_CODES[baseCountry]);
-      setPhoneParts(DEFAULT_PHONE_SEGMENTS.map(() => ""));
+    const fmt = baseCountry && COUNTRY_PHONE_FORMATS[baseCountry];
+    if (fmt) {
+      setPhoneCode(fmt.code);
+      setPhoneParts(fmt.segments.map(() => ""));
     }
   }, [baseCountry]);
 
@@ -599,34 +322,12 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
               {activeTab === "travel" && (
                 <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Preferred airports</Label>
-                      <Input placeholder="e.g. JFK, LGA, EWR" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                  {TRAVEL_FIELDS.map(({ label, placeholder }) => (
+                    <div key={label} className="space-y-1.5">
+                      <Label className="font-departure-mono">{label}</Label>
+                      <Input placeholder={placeholder} className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Seat class</Label>
-                      <Input placeholder="Economy / Business / First" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Hotel level</Label>
-                      <Input placeholder="Budget / Standard / Luxury" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Dietary restrictions</Label>
-                      <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Accessibility needs</Label>
-                      <Input placeholder="Any accessibility requirements" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Favorite airlines</Label>
-                      <Input placeholder="e.g. Delta, United" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="font-departure-mono">Favorite hotel chains</Label>
-                      <Input placeholder="e.g. Marriott, Hilton" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                    </div>
+                  ))}
                 </div>
               )}
 
@@ -646,58 +347,31 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
               {activeTab === "integrations" && (
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium font-departure-mono">Gmail / Outlook</p>
-                        <p className="text-sm text-muted-foreground font-departure-mono">Import reservations from email</p>
+                  {INTEGRATIONS.map((item, i) => (
+                    <div key={item.name}>
+                      {i > 0 && <Separator />}
+                      <div className={cn("flex items-center justify-between", item.disabled && "opacity-60")}>
+                        <div>
+                          <p className="font-medium font-departure-mono">{item.name}</p>
+                          <p className="text-sm text-muted-foreground font-departure-mono">{item.desc}</p>
+                        </div>
+                        <Button variant="outline" size="sm" disabled={item.disabled}>
+                          {item.disabled ? "Coming soon" : "Connect"}
+                        </Button>
                       </div>
-                      <Button variant="outline" size="sm">Connect</Button>
                     </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium font-departure-mono">Calendar sync</p>
-                        <p className="text-sm text-muted-foreground font-departure-mono">Sync trips to your calendar</p>
-                      </div>
-                      <Button variant="outline" size="sm">Connect</Button>
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between opacity-60">
-                      <div>
-                        <p className="font-medium font-departure-mono">WhatsApp</p>
-                        <p className="text-sm text-muted-foreground font-departure-mono">Future agent messaging</p>
-                      </div>
-                      <Button variant="outline" size="sm" disabled>Coming soon</Button>
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between opacity-60">
-                      <div>
-                        <p className="font-medium font-departure-mono">iMessage</p>
-                        <p className="text-sm text-muted-foreground font-departure-mono">Future agent messaging</p>
-                      </div>
-                      <Button variant="outline" size="sm" disabled>Coming soon</Button>
-                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === "notifications" && (
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="booking" className="font-departure-mono">Booking confirmations</Label>
-                      <Switch id="booking" defaultChecked />
+                  {NOTIFICATION_ITEMS.map(({ id, label }) => (
+                    <div key={id} className="flex items-center justify-between">
+                      <Label htmlFor={id} className="font-departure-mono">{label}</Label>
+                      <Switch id={id} defaultChecked />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="price" className="font-departure-mono">Price drops</Label>
-                      <Switch id="price" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="itinerary" className="font-departure-mono">Itinerary changes</Label>
-                      <Switch id="itinerary" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="reminders" className="font-departure-mono">Travel reminders</Label>
-                      <Switch id="reminders" defaultChecked />
-                    </div>
+                  ))}
                 </div>
               )}
             </div>

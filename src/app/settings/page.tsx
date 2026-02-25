@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { TRAVEL_FIELDS, INTEGRATIONS, NOTIFICATION_ITEMS } from "@/data/settings";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   return (
@@ -40,34 +42,12 @@ export default function SettingsPage() {
               <CardDescription className="font-wenkai-mono-bold">Customize how Map plans your trips</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Preferred airports</Label>
-                <Input placeholder="e.g. JFK, LGA, EWR" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Seat class</Label>
-                <Input placeholder="Economy / Business / First" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Hotel level</Label>
-                <Input placeholder="Budget / Standard / Luxury" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Dietary restrictions</Label>
-                <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Accessibility needs</Label>
-                <Input placeholder="Any accessibility requirements" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Favorite airlines</Label>
-                <Input placeholder="e.g. Delta, United" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
-              <div className="space-y-2">
-                <Label className="font-wenkai-mono-bold">Favorite hotel chains</Label>
-                <Input placeholder="e.g. Marriott, Hilton" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-              </div>
+              {TRAVEL_FIELDS.map(({ label, placeholder }) => (
+                <div key={label} className="space-y-2">
+                  <Label className="font-wenkai-mono-bold">{label}</Label>
+                  <Input placeholder={placeholder} className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                </div>
+              ))}
             </CardContent>
         </Card>
 
@@ -135,22 +115,12 @@ export default function SettingsPage() {
               <CardDescription className="font-wenkai-mono-bold">Choose what you want to be notified about</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="booking" className="font-wenkai-mono-bold">Booking confirmations</Label>
-                <Switch id="booking" defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="price" className="font-wenkai-mono-bold">Price drops</Label>
-                <Switch id="price" defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="itinerary" className="font-wenkai-mono-bold">Itinerary changes</Label>
-                <Switch id="itinerary" defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="reminders" className="font-wenkai-mono-bold">Travel reminders</Label>
-                <Switch id="reminders" defaultChecked />
-              </div>
+              {NOTIFICATION_ITEMS.map(({ id, label }) => (
+                <div key={id} className="flex items-center justify-between">
+                  <Label htmlFor={id} className="font-wenkai-mono-bold">{label}</Label>
+                  <Switch id={id} defaultChecked />
+                </div>
+              ))}
             </CardContent>
         </Card>
       </div>

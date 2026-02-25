@@ -59,6 +59,74 @@ const documentItems = [
   { icon: Activity, label: "Activities", href: "/documents/activities" },
 ] as const;
 
+const NAV_BTN = "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200";
+
+function ThemeRadioGroup({ theme, setTheme }: { theme: string | undefined; setTheme: (v: string) => void }) {
+  return (
+    <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
+      <DropdownMenuRadioItem value="light" className="gap-2">
+        <Sun className="h-4 w-4 shrink-0" />
+        Light
+      </DropdownMenuRadioItem>
+      <DropdownMenuRadioItem value="dark" className="gap-2">
+        <Moon className="h-4 w-4 shrink-0" />
+        Dark
+      </DropdownMenuRadioItem>
+      <DropdownMenuRadioItem value="system" className="gap-2">
+        <Monitor className="h-4 w-4 shrink-0" />
+        System
+      </DropdownMenuRadioItem>
+    </DropdownMenuRadioGroup>
+  );
+}
+
+function CollapsibleNavSection({
+  icon: Icon,
+  label,
+  href,
+  title,
+  isCollapsed,
+  open,
+  onToggle,
+  onCollapsedClick,
+  onLinkClick,
+  children,
+}: {
+  icon: typeof Map;
+  label: string;
+  href: string;
+  title: string;
+  isCollapsed: boolean;
+  open: boolean;
+  onToggle: () => void;
+  onCollapsedClick?: () => void;
+  onLinkClick?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      {isCollapsed ? (
+        <Button variant="ghost" className={`${NAV_BTN} justify-center px-0 w-full`} title={title} onClick={onCollapsedClick}>
+          <Icon className="h-4 w-4 shrink-0" />
+        </Button>
+      ) : (
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" className={`${NAV_BTN} justify-start gap-3 flex-1 min-w-0`} asChild>
+            <Link href={href} onClick={onLinkClick} className="flex items-center gap-3">
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="flex-1 text-left">{label}</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent" onClick={onToggle}>
+            <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", open && "rotate-180")} />
+          </Button>
+        </div>
+      )}
+      {!isCollapsed && open && <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">{children}</div>}
+    </div>
+  );
+}
+
 function SidebarContent({
   onLinkClick,
   forceExpanded,
@@ -150,172 +218,65 @@ function SidebarContent({
             </Link>
           </Button>
 
-          <div className="flex flex-col gap-0.5">
-            {isCollapsed ? (
-              <Button
-                variant="ghost"
-                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
-                title="Trips"
-                onClick={() => {
-                  toggleCollapsed();
-                  setTripsOpen(true);
-                }}
-              >
-                <Map className="h-4 w-4 shrink-0" />
-              </Button>
+          <CollapsibleNavSection
+            icon={Map}
+            label="Trips"
+            href="/trip"
+            title="Trips"
+            isCollapsed={isCollapsed}
+            open={tripsOpen}
+            onToggle={() => setTripsOpen((o) => !o)}
+            onCollapsedClick={() => { toggleCollapsed(); setTripsOpen(true); }}
+            onLinkClick={onLinkClick}
+          >
+            {PLACEHOLDER_TRIPS.length === 0 ? (
+              <span className="font-departure-mono text-xs text-muted-foreground py-1">No trips yet</span>
             ) : (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
-                  asChild
-                >
-                  <Link href="/trip" onClick={onLinkClick} className="flex items-center gap-3">
-                    <Map className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 text-left">Trips</span>
-                  </Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
-                  onClick={() => setTripsOpen((o) => !o)}
-                >
-                  <ChevronDown
-                    className={cn("h-4 w-4 shrink-0 transition-transform", tripsOpen && "rotate-180")}
-                  />
-                </Button>
-              </div>
+              PLACEHOLDER_TRIPS.map((trip) => (
+                <Link key={trip.id} href={`/trip/${trip.id}`} onClick={onLinkClick} className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1">
+                  {trip.name}
+                </Link>
+              ))
             )}
-            {!isCollapsed && tripsOpen && (
-              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
-                {PLACEHOLDER_TRIPS.length === 0 ? (
-                  <span className="font-departure-mono text-xs text-muted-foreground py-1">
-                    No trips yet
-                  </span>
-                ) : (
-                  PLACEHOLDER_TRIPS.map((trip) => (
-                    <Link
-                      key={trip.id}
-                      href={`/trip/${trip.id}`}
-                      onClick={onLinkClick}
-                      className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1"
-                    >
-                      {trip.name}
-                    </Link>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
+          </CollapsibleNavSection>
 
-          <div className="flex flex-col gap-0.5">
-            {isCollapsed ? (
-              <Button
-                variant="ghost"
-                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
-                title="Luggage"
-                onClick={() => {
-                  toggleCollapsed();
-                  setLuggageOpen(true);
-                }}
-              >
-                <Briefcase className="h-4 w-4 shrink-0" />
-              </Button>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
-                  asChild
-                >
-                  <Link href="/luggage" onClick={onLinkClick} className="flex items-center gap-3">
-                    <Briefcase className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 text-left">Luggage</span>
-                  </Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
-                  onClick={() => setLuggageOpen((o) => !o)}
-                >
-                  <ChevronDown
-                    className={cn("h-4 w-4 shrink-0 transition-transform", luggageOpen && "rotate-180")}
-                  />
-                </Button>
-              </div>
-            )}
-            {!isCollapsed && luggageOpen && (
-              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
-                {luggageItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={onLinkClick}
-                    className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2"
-                  >
-                    <item.icon className="h-3.5 w-3.5 shrink-0" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          <CollapsibleNavSection
+            icon={Briefcase}
+            label="Luggage"
+            href="/luggage"
+            title="Luggage"
+            isCollapsed={isCollapsed}
+            open={luggageOpen}
+            onToggle={() => setLuggageOpen((o) => !o)}
+            onCollapsedClick={() => { toggleCollapsed(); setLuggageOpen(true); }}
+            onLinkClick={onLinkClick}
+          >
+            {luggageItems.map((item) => (
+              <Link key={item.label} href={item.href} onClick={onLinkClick} className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2">
+                <item.icon className="h-3.5 w-3.5 shrink-0" />
+                {item.label}
+              </Link>
+            ))}
+          </CollapsibleNavSection>
 
-          <div className="flex flex-col gap-0.5">
-            {isCollapsed ? (
-              <Button
-                variant="ghost"
-                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
-                title="Documents"
-                onClick={() => {
-                  toggleCollapsed();
-                  setDocumentsOpen(true);
-                }}
-              >
-                <FileText className="h-4 w-4 shrink-0" />
-              </Button>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
-                  asChild
-                >
-                  <Link href="/documents" onClick={onLinkClick} className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 text-left">Documents</span>
-                  </Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
-                  onClick={() => setDocumentsOpen((o) => !o)}
-                >
-                  <ChevronDown
-                    className={cn("h-4 w-4 shrink-0 transition-transform", documentsOpen && "rotate-180")}
-                  />
-                </Button>
-              </div>
-            )}
-            {!isCollapsed && documentsOpen && (
-              <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
-                {documentItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={onLinkClick}
-                    className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2"
-                  >
-                    <item.icon className="h-3.5 w-3.5 shrink-0" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          <CollapsibleNavSection
+            icon={FileText}
+            label="Documents"
+            href="/documents"
+            title="Documents"
+            isCollapsed={isCollapsed}
+            open={documentsOpen}
+            onToggle={() => setDocumentsOpen((o) => !o)}
+            onCollapsedClick={() => { toggleCollapsed(); setDocumentsOpen(true); }}
+            onLinkClick={onLinkClick}
+          >
+            {documentItems.map((item) => (
+              <Link key={item.label} href={item.href} onClick={onLinkClick} className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1 flex items-center gap-2">
+                <item.icon className="h-3.5 w-3.5 shrink-0" />
+                {item.label}
+              </Link>
+            ))}
+          </CollapsibleNavSection>
         </nav>
       </div>
 
@@ -342,20 +303,7 @@ function SidebarContent({
                 Passport
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
-                <DropdownMenuRadioItem value="light" className="gap-2">
-                  <Sun className="h-4 w-4 shrink-0" />
-                  Light
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="dark" className="gap-2">
-                  <Moon className="h-4 w-4 shrink-0" />
-                  Dark
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="system" className="gap-2">
-                  <Monitor className="h-4 w-4 shrink-0" />
-                  System
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
+              <ThemeRadioGroup theme={theme} setTheme={setTheme} />
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
@@ -389,20 +337,7 @@ function SidebarContent({
                     Passport
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
-                    <DropdownMenuRadioItem value="light" className="gap-2">
-                      <Sun className="h-4 w-4 shrink-0" />
-                      Light
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="dark" className="gap-2">
-                      <Moon className="h-4 w-4 shrink-0" />
-                      Dark
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="system" className="gap-2">
-                      <Monitor className="h-4 w-4 shrink-0" />
-                      System
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
+                  <ThemeRadioGroup theme={theme} setTheme={setTheme} />
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
