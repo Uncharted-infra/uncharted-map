@@ -195,23 +195,23 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <Card className="h-fit">
                   <CardHeader>
                     <CardTitle className="font-departure-mono">Account</CardTitle>
-                    <CardDescription className="font-wenkai-mono-bold">Manage your account details</CardDescription>
+                    <CardDescription className="font-departure-mono">Manage your account details</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Name</Label>
+                      <Label className="font-departure-mono">Name</Label>
                       <div className="grid grid-cols-2 gap-3">
-                        <Input id="first-name" placeholder="First name" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
-                        <Input id="last-name" placeholder="Last name" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                        <Input id="first-name" placeholder="First name" className="font-departure-mono placeholder:font-departure-mono" />
+                        <Input id="last-name" placeholder="Last name" className="font-departure-mono placeholder:font-departure-mono" />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Country of Residence</Label>
+                      <Label className="font-departure-mono">Country of Residence</Label>
                       <Popover open={baseCountryOpen} onOpenChange={setBaseCountryOpen}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between font-wenkai-mono-bold h-9"
+                            className="w-full justify-between font-departure-mono h-9"
                           >
                             {baseCountry ?? "Select country"}
                             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -237,7 +237,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                                       setBaseCountryOpen(false);
                                     }}
                                     className={cn(
-                                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-wenkai-mono-bold",
+                                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-departure-mono",
                                       "focus:outline-none",
                                       isSelected
                                         ? "bg-accent shadow-md"
@@ -254,13 +254,13 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       </Popover>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Phone number</Label>
+                      <Label className="font-departure-mono">Phone number</Label>
                       <div className="flex gap-2 items-center">
                         <Input
                           value={phoneCode}
                           onChange={(e) => setPhoneCode(e.target.value)}
                           placeholder="+1"
-                          className="w-24 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold shrink-0"
+                          className="w-24 font-departure-mono placeholder:font-departure-mono shrink-0"
                         />
                         <Input
                           value={phonePart1}
@@ -268,7 +268,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="555"
                           type="tel"
                           maxLength={3}
-                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                          className="w-14 font-departure-mono placeholder:font-departure-mono text-center"
                         />
                         <Input
                           value={phonePart2}
@@ -276,7 +276,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="123"
                           type="tel"
                           maxLength={3}
-                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                          className="w-14 font-departure-mono placeholder:font-departure-mono text-center"
                         />
                         <Input
                           value={phonePart3}
@@ -284,17 +284,17 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="4567"
                           type="tel"
                           maxLength={4}
-                          className="w-16 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                          className="w-16 font-departure-mono placeholder:font-departure-mono text-center"
                         />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="email" className="font-wenkai-mono-bold">Email</Label>
-                      <Input id="email" type="email" placeholder="you@example.com" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label htmlFor="email" className="font-departure-mono">Email</Label>
+                      <Input id="email" type="email" placeholder="you@example.com" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="password" className="font-wenkai-mono-bold">Password</Label>
-                      <p className="text-xs text-muted-foreground font-wenkai-mono-bold whitespace-nowrap">
+                      <Label htmlFor="password" className="font-departure-mono">Password</Label>
+                      <p className="text-xs text-muted-foreground font-departure-mono whitespace-nowrap">
                         min 8 characters, 1 upper/lowercase, 1 special character
                       </p>
                       <Input
@@ -304,33 +304,33 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={cn(
-                          "font-wenkai-mono-bold placeholder:font-wenkai-mono-bold",
+                          "font-departure-mono placeholder:font-departure-mono",
                           !passwordValid && "border-destructive focus-visible:ring-destructive"
                         )}
                       />
                       {!passwordValid && password && (
-                        <p className="text-xs text-destructive font-wenkai-mono-bold">Password does not meet requirements</p>
+                        <p className="text-xs text-destructive font-departure-mono">Password does not meet requirements</p>
                       )}
                       {passwordValid && password && (
                         <div className="flex items-center gap-2 text-green-600 dark:text-green-500">
                           <Check className="h-4 w-4 shrink-0" />
-                          <span className="text-xs font-wenkai-mono-bold" title="password is good to go!">
+                          <span className="text-xs font-departure-mono" title="password is good to go!">
                             password is good to go!
                           </span>
                         </div>
                       )}
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Personality</Label>
-                      <p className="text-xs text-muted-foreground font-wenkai-mono-bold whitespace-nowrap">MBTI type – acronym and description</p>
+                      <Label className="font-departure-mono">Personality</Label>
+                      <p className="text-xs text-muted-foreground font-departure-mono whitespace-nowrap">MBTI type – acronym and description</p>
                       <Popover open={personalityOpen} onOpenChange={setPersonalityOpen}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between font-wenkai-mono-bold h-auto min-h-9 py-2"
+                            className="w-full justify-between font-departure-mono h-auto min-h-9 py-2"
                           >
                             {personality ? (
-                              <Badge variant="secondary" className="font-wenkai-mono-bold">
+                              <Badge variant="secondary" className="font-departure-mono">
                                 {personality.id} – {personality.title}
                               </Badge>
                             ) : (
@@ -372,7 +372,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                                         <span className="font-departure-mono font-medium">
                                           {item.id} – {item.title}
                                         </span>
-                                        <p className="text-xs text-muted-foreground mt-0.5 font-wenkai-mono-bold">
+                                        <p className="text-xs text-muted-foreground mt-0.5 font-departure-mono">
                                           {item.desc}
                                         </p>
                                       </button>
@@ -404,36 +404,36 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <Card className="h-fit">
                   <CardHeader>
                     <CardTitle className="font-departure-mono">Travel Preferences</CardTitle>
-                    <CardDescription className="font-wenkai-mono-bold">Customize how Map plans your trips</CardDescription>
+                    <CardDescription className="font-departure-mono">Customize how Map plans your trips</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Preferred airports</Label>
-                      <Input placeholder="e.g. JFK, LGA, EWR" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Preferred airports</Label>
+                      <Input placeholder="e.g. JFK, LGA, EWR" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Seat class</Label>
-                      <Input placeholder="Economy / Business / First" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Seat class</Label>
+                      <Input placeholder="Economy / Business / First" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Hotel level</Label>
-                      <Input placeholder="Budget / Standard / Luxury" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Hotel level</Label>
+                      <Input placeholder="Budget / Standard / Luxury" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Dietary restrictions</Label>
-                      <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Dietary restrictions</Label>
+                      <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Accessibility needs</Label>
-                      <Input placeholder="Any accessibility requirements" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Accessibility needs</Label>
+                      <Input placeholder="Any accessibility requirements" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Favorite airlines</Label>
-                      <Input placeholder="e.g. Delta, United" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Favorite airlines</Label>
+                      <Input placeholder="e.g. Delta, United" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="font-wenkai-mono-bold">Favorite hotel chains</Label>
-                      <Input placeholder="e.g. Marriott, Hilton" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                      <Label className="font-departure-mono">Favorite hotel chains</Label>
+                      <Input placeholder="e.g. Marriott, Hilton" className="font-departure-mono placeholder:font-departure-mono" />
                     </div>
                   </CardContent>
                 </Card>
@@ -443,16 +443,16 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <Card className="h-fit">
                   <CardHeader>
                     <CardTitle className="font-departure-mono">Maps (Token Usage)</CardTitle>
-                    <CardDescription className="font-wenkai-mono-bold">Your daily maps allowance</CardDescription>
+                    <CardDescription className="font-departure-mono">Your daily maps allowance</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="font-wenkai-mono-bold">Daily maps remaining</span>
-                      <span className="font-wenkai-mono-bold">12</span>
+                      <span className="font-departure-mono">Daily maps remaining</span>
+                      <span className="font-departure-mono">12</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-wenkai-mono-bold">Refill date</span>
-                      <span className="font-wenkai-mono-bold">Tomorrow</span>
+                      <span className="font-departure-mono">Refill date</span>
+                      <span className="font-departure-mono">Tomorrow</span>
                     </div>
                     <Button>Upgrade plan</Button>
                   </CardContent>
@@ -463,37 +463,37 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <Card className="h-fit">
                   <CardHeader>
                     <CardTitle className="font-departure-mono">Integrations</CardTitle>
-                    <CardDescription className="font-wenkai-mono-bold">Connect your accounts to import reservations</CardDescription>
+                    <CardDescription className="font-departure-mono">Connect your accounts to import reservations</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium font-wenkai-mono-bold">Gmail / Outlook</p>
-                        <p className="text-sm text-muted-foreground font-wenkai-mono-bold">Import reservations from email</p>
+                        <p className="font-medium font-departure-mono">Gmail / Outlook</p>
+                        <p className="text-sm text-muted-foreground font-departure-mono">Import reservations from email</p>
                       </div>
                       <Button variant="outline" size="sm">Connect</Button>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium font-wenkai-mono-bold">Calendar sync</p>
-                        <p className="text-sm text-muted-foreground font-wenkai-mono-bold">Sync trips to your calendar</p>
+                        <p className="font-medium font-departure-mono">Calendar sync</p>
+                        <p className="text-sm text-muted-foreground font-departure-mono">Sync trips to your calendar</p>
                       </div>
                       <Button variant="outline" size="sm">Connect</Button>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between opacity-60">
                       <div>
-                        <p className="font-medium font-wenkai-mono-bold">WhatsApp</p>
-                        <p className="text-sm text-muted-foreground font-wenkai-mono-bold">Future agent messaging</p>
+                        <p className="font-medium font-departure-mono">WhatsApp</p>
+                        <p className="text-sm text-muted-foreground font-departure-mono">Future agent messaging</p>
                       </div>
                       <Button variant="outline" size="sm" disabled>Coming soon</Button>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between opacity-60">
                       <div>
-                        <p className="font-medium font-wenkai-mono-bold">iMessage</p>
-                        <p className="text-sm text-muted-foreground font-wenkai-mono-bold">Future agent messaging</p>
+                        <p className="font-medium font-departure-mono">iMessage</p>
+                        <p className="text-sm text-muted-foreground font-departure-mono">Future agent messaging</p>
                       </div>
                       <Button variant="outline" size="sm" disabled>Coming soon</Button>
                     </div>
@@ -505,23 +505,23 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 <Card className="h-fit">
                   <CardHeader>
                     <CardTitle className="font-departure-mono">Notifications</CardTitle>
-                    <CardDescription className="font-wenkai-mono-bold">Choose what you want to be notified about</CardDescription>
+                    <CardDescription className="font-departure-mono">Choose what you want to be notified about</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="booking" className="font-wenkai-mono-bold">Booking confirmations</Label>
+                      <Label htmlFor="booking" className="font-departure-mono">Booking confirmations</Label>
                       <Switch id="booking" defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="price" className="font-wenkai-mono-bold">Price drops</Label>
+                      <Label htmlFor="price" className="font-departure-mono">Price drops</Label>
                       <Switch id="price" defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="itinerary" className="font-wenkai-mono-bold">Itinerary changes</Label>
+                      <Label htmlFor="itinerary" className="font-departure-mono">Itinerary changes</Label>
                       <Switch id="itinerary" defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="reminders" className="font-wenkai-mono-bold">Travel reminders</Label>
+                      <Label htmlFor="reminders" className="font-departure-mono">Travel reminders</Label>
                       <Switch id="reminders" defaultChecked />
                     </div>
                   </CardContent>
