@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -192,18 +191,45 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
           <ScrollArea className="flex-1 min-w-0 pl-[240px]">
             <div className="p-6 pt-14">
               {activeTab === "account" && (
-                <Card className="h-fit">
-                  <CardHeader>
-                    <CardTitle className="font-departure-mono">Account</CardTitle>
-                    <CardDescription className="font-departure-mono">Manage your account details</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="space-y-4">
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Name</Label>
                       <div className="grid grid-cols-2 gap-3">
-                        <Input id="first-name" placeholder="First name" className="font-departure-mono placeholder:font-departure-mono" />
-                        <Input id="last-name" placeholder="Last name" className="font-departure-mono placeholder:font-departure-mono" />
+                        <Input id="first-name" placeholder="First name" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                        <Input id="last-name" placeholder="Last name" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                       </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email" className="font-departure-mono">Email</Label>
+                      <Input id="email" type="email" placeholder="you@example.com" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="password" className="font-departure-mono">Password</Label>
+                      <p className="text-xs text-muted-foreground font-departure-mono whitespace-nowrap">
+                        min 8 characters, 1 upper/lowercase, 1 special character
+                      </p>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={cn(
+                          "font-wenkai-mono-bold placeholder:font-wenkai-mono-bold",
+                          !passwordValid && "border-destructive focus-visible:ring-destructive"
+                        )}
+                      />
+                      {!passwordValid && password && (
+                        <p className="text-xs text-destructive font-departure-mono">Password does not meet requirements</p>
+                      )}
+                      {passwordValid && password && (
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-500">
+                          <Check className="h-4 w-4 shrink-0" />
+                          <span className="text-xs font-departure-mono" title="password is good to go!">
+                            password is good to go!
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Country of Residence</Label>
@@ -211,7 +237,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between font-departure-mono h-9"
+                            className="w-full justify-between font-wenkai-mono-bold h-9"
                           >
                             {baseCountry ?? "Select country"}
                             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -237,7 +263,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                                       setBaseCountryOpen(false);
                                     }}
                                     className={cn(
-                                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-departure-mono",
+                                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-wenkai-mono-bold",
                                       "focus:outline-none",
                                       isSelected
                                         ? "bg-accent shadow-md"
@@ -260,7 +286,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           value={phoneCode}
                           onChange={(e) => setPhoneCode(e.target.value)}
                           placeholder="+1"
-                          className="w-24 font-departure-mono placeholder:font-departure-mono shrink-0"
+                          className="w-24 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold shrink-0"
                         />
                         <Input
                           value={phonePart1}
@@ -268,7 +294,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="555"
                           type="tel"
                           maxLength={3}
-                          className="w-14 font-departure-mono placeholder:font-departure-mono text-center"
+                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
                         />
                         <Input
                           value={phonePart2}
@@ -276,7 +302,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="123"
                           type="tel"
                           maxLength={3}
-                          className="w-14 font-departure-mono placeholder:font-departure-mono text-center"
+                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
                         />
                         <Input
                           value={phonePart3}
@@ -284,41 +310,9 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           placeholder="4567"
                           type="tel"
                           maxLength={4}
-                          className="w-16 font-departure-mono placeholder:font-departure-mono text-center"
+                          className="w-16 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
                         />
                       </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="email" className="font-departure-mono">Email</Label>
-                      <Input id="email" type="email" placeholder="you@example.com" className="font-departure-mono placeholder:font-departure-mono" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="password" className="font-departure-mono">Password</Label>
-                      <p className="text-xs text-muted-foreground font-departure-mono whitespace-nowrap">
-                        min 8 characters, 1 upper/lowercase, 1 special character
-                      </p>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={cn(
-                          "font-departure-mono placeholder:font-departure-mono",
-                          !passwordValid && "border-destructive focus-visible:ring-destructive"
-                        )}
-                      />
-                      {!passwordValid && password && (
-                        <p className="text-xs text-destructive font-departure-mono">Password does not meet requirements</p>
-                      )}
-                      {passwordValid && password && (
-                        <div className="flex items-center gap-2 text-green-600 dark:text-green-500">
-                          <Check className="h-4 w-4 shrink-0" />
-                          <span className="text-xs font-departure-mono" title="password is good to go!">
-                            password is good to go!
-                          </span>
-                        </div>
-                      )}
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Personality</Label>
@@ -396,56 +390,44 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       Delete account
                     </Button>
                   </div>
-                  </CardContent>
-                </Card>
+                </div>
               )}
 
               {activeTab === "travel" && (
-                <Card className="h-fit">
-                  <CardHeader>
-                    <CardTitle className="font-departure-mono">Travel Preferences</CardTitle>
-                    <CardDescription className="font-departure-mono">Customize how Map plans your trips</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="space-y-4">
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Preferred airports</Label>
-                      <Input placeholder="e.g. JFK, LGA, EWR" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="e.g. JFK, LGA, EWR" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Seat class</Label>
-                      <Input placeholder="Economy / Business / First" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="Economy / Business / First" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Hotel level</Label>
-                      <Input placeholder="Budget / Standard / Luxury" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="Budget / Standard / Luxury" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Dietary restrictions</Label>
-                      <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="e.g. Vegetarian, Gluten-free" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Accessibility needs</Label>
-                      <Input placeholder="Any accessibility requirements" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="Any accessibility requirements" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Favorite airlines</Label>
-                      <Input placeholder="e.g. Delta, United" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="e.g. Delta, United" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-departure-mono">Favorite hotel chains</Label>
-                      <Input placeholder="e.g. Marriott, Hilton" className="font-departure-mono placeholder:font-departure-mono" />
+                      <Input placeholder="e.g. Marriott, Hilton" className="font-wenkai-mono-bold placeholder:font-wenkai-mono-bold" />
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               )}
 
               {activeTab === "maps" && (
-                <Card className="h-fit">
-                  <CardHeader>
-                    <CardTitle className="font-departure-mono">Maps (Token Usage)</CardTitle>
-                    <CardDescription className="font-departure-mono">Your daily maps allowance</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="font-departure-mono">Daily maps remaining</span>
                       <span className="font-departure-mono">12</span>
@@ -455,17 +437,11 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       <span className="font-departure-mono">Tomorrow</span>
                     </div>
                     <Button>Upgrade plan</Button>
-                  </CardContent>
-                </Card>
+                </div>
               )}
 
               {activeTab === "integrations" && (
-                <Card className="h-fit">
-                  <CardHeader>
-                    <CardTitle className="font-departure-mono">Integrations</CardTitle>
-                    <CardDescription className="font-departure-mono">Connect your accounts to import reservations</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium font-departure-mono">Gmail / Outlook</p>
@@ -497,17 +473,11 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       </div>
                       <Button variant="outline" size="sm" disabled>Coming soon</Button>
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               )}
 
               {activeTab === "notifications" && (
-                <Card className="h-fit">
-                  <CardHeader>
-                    <CardTitle className="font-departure-mono">Notifications</CardTitle>
-                    <CardDescription className="font-departure-mono">Choose what you want to be notified about</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="booking" className="font-departure-mono">Booking confirmations</Label>
                       <Switch id="booking" defaultChecked />
@@ -524,8 +494,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       <Label htmlFor="reminders" className="font-departure-mono">Travel reminders</Label>
                       <Switch id="reminders" defaultChecked />
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               )}
             </div>
           </ScrollArea>
