@@ -38,10 +38,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { SettingsModal } from "@/components/map/settings-modal";
 import { cn } from "@/lib/utils";
 
 // Placeholder trips - will be replaced with real data when trips are created
 const PLACEHOLDER_TRIPS: { id: string; name: string }[] = [];
+
+// Plan tiers: adventurer | nomad | wanderlust | enterprise
+const CURRENT_PLAN = "enterprise";
 
 const luggageItems = [
   { icon: MapPin, label: "Places", href: "/luggage/places" },
@@ -58,7 +62,8 @@ const documentItems = [
 function SidebarContent({
   onLinkClick,
   forceExpanded,
-}: { onLinkClick?: () => void; forceExpanded?: boolean }) {
+  onOpenSettings,
+}: { onLinkClick?: () => void; forceExpanded?: boolean; onOpenSettings?: () => void }) {
   const pathname = usePathname();
   const { collapsed, toggleCollapsed } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -299,29 +304,26 @@ function SidebarContent({
         </nav>
       </div>
 
-      <div className={cn("shrink-0 p-4", isCollapsed && "p-2")}>
-        <div className={cn(isCollapsed && "flex justify-center")}>
+      <div className={cn("shrink-0 border-t border-border", isCollapsed ? "p-2 flex justify-center" : "p-4")}>
+        {isCollapsed ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className={cn(
-                  "h-8 w-8 rounded-full p-0 border-0 shadow-none hover:bg-transparent",
-                  isCollapsed && "w-8"
-                )}
+                className="h-8 w-8 rounded-full p-0 border-0 shadow-none hover:bg-transparent"
                 aria-label="Profile menu"
               >
                 <Avatar className="h-8 w-8 shrink-0">
-                  <AvatarFallback className="font-departure-mono text-xs">U</AvatarFallback>
+                  <AvatarFallback className="bg-primary/20 text-primary text-xs font-medium font-departure-mono">
+                    AS
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align={isCollapsed ? "center" : "start"} side="top" className="font-departure-mono">
-              <DropdownMenuItem asChild>
-                <Link href="/settings" onClick={onLinkClick}>
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Link>
+            <DropdownMenuContent align="center" side="top" className="font-departure-mono">
+              <DropdownMenuItem onClick={onOpenSettings}>
+                <Settings className="h-4 w-4" />
+                Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
@@ -340,7 +342,61 @@ function SidebarContent({
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-md hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    aria-label="Profile menu"
+                  >
+                    <Avatar className="h-8 w-8 shrink-0">
+                      <AvatarFallback className="bg-primary/20 text-primary text-xs font-medium font-departure-mono">
+                        AS
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        Ayush Sharma
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {CURRENT_PLAN.charAt(0).toUpperCase() + CURRENT_PLAN.slice(1)}
+                      </p>
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="font-departure-mono">
+                  <DropdownMenuItem onClick={onOpenSettings}>
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
+                    <DropdownMenuRadioItem value="light" className="gap-2">
+                      <Sun className="h-4 w-4 shrink-0" />
+                      Light
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark" className="gap-2">
+                      <Moon className="h-4 w-4 shrink-0" />
+                      Dark
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="system" className="gap-2">
+                      <Monitor className="h-4 w-4 shrink-0" />
+                      System
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <Button variant="outline" size="sm" className="w-full font-departure-mono" asChild>
+              <Link href="/" onClick={onLinkClick}>
+                Upgrade
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -348,6 +404,7 @@ function SidebarContent({
 
 export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { sidebarWidth } = useSidebar();
 
   return (
@@ -356,7 +413,7 @@ export function AppSidebar() {
         className="fixed left-0 top-0 z-40 h-screen border-r bg-card font-departure-mono flex flex-col overflow-hidden hidden md:flex transition-[width] duration-200 ease-out"
         style={{ width: sidebarWidth }}
       >
-        <SidebarContent />
+        <SidebarContent onOpenSettings={() => setSettingsOpen(true)} />
       </aside>
 
       <div className="fixed left-0 top-0 z-40 flex md:hidden items-center gap-2 p-2">
@@ -382,10 +439,19 @@ export function AppSidebar() {
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen} modal={false}>
         <SheetContent side="left" className="w-[260px] p-0 flex flex-col">
           <div className="flex flex-1 flex-col overflow-hidden font-departure-mono pt-4">
-            <SidebarContent onLinkClick={() => setMobileOpen(false)} forceExpanded />
+            <SidebarContent
+              onLinkClick={() => setMobileOpen(false)}
+              forceExpanded
+              onOpenSettings={() => {
+                setMobileOpen(false)
+                setSettingsOpen(true)
+              }}
+            />
           </div>
         </SheetContent>
       </Sheet>
+
+      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </>
   );
 }
