@@ -9,7 +9,7 @@ import {
   Search,
   Map,
   Briefcase,
-  Settings,
+  Compass,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -159,9 +159,9 @@ function SidebarContent({
             )}
             asChild
           >
-            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
-              <PassportIcon />
-              {!isCollapsed && "Passport"}
+            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Compass" : undefined}>
+              <Compass className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Compass"}
             </Link>
           </Button>
 
@@ -322,8 +322,8 @@ function SidebarContent({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" side="top" className="font-departure-mono">
               <DropdownMenuItem onClick={onOpenSettings}>
-                <Settings className="h-4 w-4" />
-                Settings
+                <PassportIcon />
+                Passport
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
@@ -369,8 +369,8 @@ function SidebarContent({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="font-departure-mono">
                   <DropdownMenuItem onClick={onOpenSettings}>
-                    <Settings className="h-4 w-4" />
-                    Settings
+                    <PassportIcon />
+                    Passport
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
