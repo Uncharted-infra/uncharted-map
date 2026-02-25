@@ -310,6 +310,7 @@ function SidebarContent({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
+                suppressHydrationWarning
                 className="h-8 w-8 rounded-full p-0 border-0 shadow-none hover:bg-transparent"
                 aria-label="Profile menu"
               >

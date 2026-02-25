@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { User, Plane, Coins, Plug, Bell, ChevronDown, Check } from "lucide-react";
+import { User, Plane, Coins, Plug, Bell, ChevronDown, Check, Save, Trash2 } from "lucide-react";
 import { PassportIcon } from "@/components/icons/passport-icon";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +51,48 @@ const COUNTRIES = [
   "Yemen",
   "Zambia", "Zimbabwe",
 ];
+
+const COUNTRY_PHONE_CODES: Record<string, string> = {
+  "Afghanistan": "+93", "Albania": "+355", "Algeria": "+213", "Andorra": "+376", "Angola": "+244",
+  "Antigua and Barbuda": "+1-268", "Argentina": "+54", "Armenia": "+374", "Australia": "+61", "Austria": "+43",
+  "Azerbaijan": "+994", "Bahamas": "+1-242", "Bahrain": "+973", "Bangladesh": "+880", "Barbados": "+1-246",
+  "Belarus": "+375", "Belgium": "+32", "Belize": "+501", "Benin": "+229", "Bhutan": "+975", "Bolivia": "+591",
+  "Bosnia and Herzegovina": "+387", "Botswana": "+267", "Brazil": "+55", "Brunei": "+673", "Bulgaria": "+359",
+  "Burkina Faso": "+226", "Burundi": "+257", "Cabo Verde": "+238", "Cambodia": "+855", "Cameroon": "+237",
+  "Canada": "+1", "Central African Republic": "+236", "Chad": "+235", "Chile": "+56", "China": "+86",
+  "Colombia": "+57", "Comoros": "+269", "Congo (Republic of the)": "+242", "Costa Rica": "+506",
+  "Côte d'Ivoire": "+225", "Croatia": "+385", "Cuba": "+53", "Cyprus": "+357", "Czechia": "+420",
+  "Democratic Republic of the Congo": "+243", "Denmark": "+45", "Djibouti": "+253", "Dominica": "+1-767",
+  "Dominican Republic": "+1-809", "Ecuador": "+593", "Egypt": "+20", "El Salvador": "+503",
+  "Equatorial Guinea": "+240", "Eritrea": "+291", "Estonia": "+372", "Eswatini": "+268", "Ethiopia": "+251",
+  "Fiji": "+679", "Finland": "+358", "France": "+33", "Gabon": "+241", "Gambia": "+220", "Georgia": "+995",
+  "Germany": "+49", "Ghana": "+233", "Greece": "+30", "Grenada": "+1-473", "Guatemala": "+502", "Guinea": "+224",
+  "Guinea-Bissau": "+245", "Guyana": "+592", "Haiti": "+509", "Honduras": "+504", "Hungary": "+36",
+  "Iceland": "+354", "India": "+91", "Indonesia": "+62", "Iran": "+98", "Iraq": "+964", "Ireland": "+353",
+  "Israel": "+972", "Italy": "+39", "Jamaica": "+1-876", "Japan": "+81", "Jordan": "+962",
+  "Kazakhstan": "+7", "Kenya": "+254", "Kiribati": "+686", "Kuwait": "+965", "Kyrgyzstan": "+996",
+  "Laos": "+856", "Latvia": "+371", "Lebanon": "+961", "Lesotho": "+266", "Liberia": "+231", "Libya": "+218",
+  "Liechtenstein": "+423", "Lithuania": "+370", "Luxembourg": "+352", "Madagascar": "+261", "Malawi": "+265",
+  "Malaysia": "+60", "Maldives": "+960", "Mali": "+223", "Malta": "+356", "Marshall Islands": "+692",
+  "Mauritania": "+222", "Mauritius": "+230", "Mexico": "+52", "Micronesia": "+691", "Moldova": "+373",
+  "Monaco": "+377", "Mongolia": "+976", "Montenegro": "+382", "Morocco": "+212", "Mozambique": "+258",
+  "Myanmar": "+95", "Namibia": "+264", "Nauru": "+674", "Nepal": "+977", "Netherlands": "+31",
+  "New Zealand": "+64", "Nicaragua": "+505", "Niger": "+227", "Nigeria": "+234", "North Korea": "+850",
+  "North Macedonia": "+389", "Norway": "+47", "Oman": "+968", "Pakistan": "+92", "Palau": "+680",
+  "Palestine": "+970", "Panama": "+507", "Papua New Guinea": "+675", "Paraguay": "+595", "Peru": "+51",
+  "Philippines": "+63", "Poland": "+48", "Portugal": "+351", "Qatar": "+974", "Romania": "+40",
+  "Russia": "+7", "Rwanda": "+250", "Saint Kitts and Nevis": "+1-869", "Saint Lucia": "+1-758",
+  "Saint Vincent and the Grenadines": "+1-784", "Samoa": "+685", "San Marino": "+378",
+  "São Tomé and Príncipe": "+239", "Saudi Arabia": "+966", "Senegal": "+221", "Serbia": "+381",
+  "Seychelles": "+248", "Sierra Leone": "+232", "Singapore": "+65", "Slovakia": "+421", "Slovenia": "+386",
+  "Solomon Islands": "+677", "Somalia": "+252", "South Africa": "+27", "South Korea": "+82", "South Sudan": "+211",
+  "Spain": "+34", "Sri Lanka": "+94", "Sudan": "+249", "Suriname": "+597", "Sweden": "+46", "Switzerland": "+41",
+  "Syria": "+963", "Tajikistan": "+992", "Tanzania": "+255", "Thailand": "+66", "Timor-Leste": "+670",
+  "Togo": "+228", "Tonga": "+676", "Trinidad and Tobago": "+1-868", "Tunisia": "+216", "Türkiye": "+90",
+  "Turkmenistan": "+993", "Tuvalu": "+688", "Uganda": "+256", "Ukraine": "+380", "United Arab Emirates": "+971",
+  "United Kingdom": "+44", "United States": "+1", "Uruguay": "+598", "Uzbekistan": "+998", "Vanuatu": "+678",
+  "Venezuela": "+58", "Vietnam": "+84", "Yemen": "+967", "Zambia": "+260", "Zimbabwe": "+263",
+};
 
 const PERSONALITY_OPTIONS = [
   { group: "🧠 Analysts", items: [
@@ -101,6 +143,16 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const [personalityOpen, setPersonalityOpen] = useState(false);
   const [baseCountry, setBaseCountry] = useState<string | null>(null);
   const [baseCountryOpen, setBaseCountryOpen] = useState(false);
+  const [phoneCode, setPhoneCode] = useState("");
+  const [phonePart1, setPhonePart1] = useState("");
+  const [phonePart2, setPhonePart2] = useState("");
+  const [phonePart3, setPhonePart3] = useState("");
+
+  useEffect(() => {
+    if (baseCountry && COUNTRY_PHONE_CODES[baseCountry]) {
+      setPhoneCode(COUNTRY_PHONE_CODES[baseCountry]);
+    }
+  }, [baseCountry]);
 
   const passwordValid = !password || PASSWORD_REGEX.test(password);
 
@@ -167,33 +219,74 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         </PopoverTrigger>
                         <PopoverContent
                           className="w-[var(--radix-popover-trigger-width)] max-h-[320px] p-0 overflow-hidden"
+                          side="bottom"
                           align="start"
                           onWheel={(e) => e.stopPropagation()}
                           onTouchMove={(e) => e.stopPropagation()}
                         >
                           <div className="max-h-[320px] overflow-y-auto overscroll-contain min-h-0">
                             <div className="p-2">
-                              {COUNTRIES.map((country) => (
-                                <button
-                                  key={country}
-                                  type="button"
-                                  onClick={() => {
-                                    setBaseCountry(country);
-                                    setBaseCountryOpen(false);
-                                  }}
-                                  className={cn(
-                                    "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-wenkai-mono-bold",
-                                    "hover:bg-accent focus:bg-accent focus:outline-none",
-                                    baseCountry === country && "bg-accent"
-                                  )}
-                                >
-                                  {country}
-                                </button>
-                              ))}
+                              {COUNTRIES.map((country) => {
+                                const isSelected = baseCountry === country;
+                                return (
+                                  <button
+                                    key={country}
+                                    type="button"
+                                    onClick={() => {
+                                      setBaseCountry(country);
+                                      setBaseCountryOpen(false);
+                                    }}
+                                    className={cn(
+                                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-wenkai-mono-bold",
+                                      "focus:outline-none",
+                                      isSelected
+                                        ? "bg-accent shadow-md"
+                                        : "hover:bg-muted focus:bg-muted"
+                                    )}
+                                  >
+                                    {country}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
                         </PopoverContent>
                       </Popover>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="font-wenkai-mono-bold">Phone number</Label>
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          value={phoneCode}
+                          onChange={(e) => setPhoneCode(e.target.value)}
+                          placeholder="+1"
+                          className="w-24 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold shrink-0"
+                        />
+                        <Input
+                          value={phonePart1}
+                          onChange={(e) => setPhonePart1(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                          placeholder="555"
+                          type="tel"
+                          maxLength={3}
+                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                        />
+                        <Input
+                          value={phonePart2}
+                          onChange={(e) => setPhonePart2(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                          placeholder="123"
+                          type="tel"
+                          maxLength={3}
+                          className="w-14 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                        />
+                        <Input
+                          value={phonePart3}
+                          onChange={(e) => setPhonePart3(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                          placeholder="4567"
+                          type="tel"
+                          maxLength={4}
+                          className="w-16 font-wenkai-mono-bold placeholder:font-wenkai-mono-bold text-center"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="email" className="font-wenkai-mono-bold">Email</Label>
@@ -248,6 +341,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         </PopoverTrigger>
                         <PopoverContent
                             className="w-[var(--radix-popover-trigger-width)] max-h-[320px] p-0 overflow-hidden"
+                            side="bottom"
                             align="start"
                             onWheel={(e) => e.stopPropagation()}
                             onTouchMove={(e) => e.stopPropagation()}
@@ -260,20 +354,21 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                                     {group.group}
                                   </p>
                                   <div className="space-y-1">
-                                    {group.items.map((item) => (
-                                      <button
-                                        key={item.id}
-                                        type="button"
-                                        onClick={() => {
-                                          setPersonality({ id: item.id, title: item.title });
-                                          setPersonalityOpen(false);
-                                        }}
-                                        className={cn(
-                                          "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                                          "hover:bg-accent focus:bg-accent focus:outline-none",
-                                          personality?.id === item.id && "bg-accent"
-                                        )}
-                                      >
+                                    {group.items.map((item) => {
+                                        const isSelected = personality?.id === item.id;
+                                        return (
+                                          <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => {
+                                              setPersonality({ id: item.id, title: item.title });
+                                              setPersonalityOpen(false);
+                                            }}
+                                            className={cn(
+                                              "w-full text-left px-3 py-2 rounded-md text-sm transition-colors focus:outline-none",
+                                              isSelected && "bg-accent shadow-md"
+                                            )}
+                                          >
                                         <span className="font-departure-mono font-medium">
                                           {item.id} – {item.title}
                                         </span>
@@ -281,7 +376,8 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                                           {item.desc}
                                         </p>
                                       </button>
-                                    ))}
+                                        );
+                                      })}
                                   </div>
                                 </div>
                               ))}
@@ -290,7 +386,16 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <Button variant="destructive" size="sm">Delete account</Button>
+                    <div className="flex items-center gap-2">
+                    <Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
+                      <Save className="h-4 w-4 shrink-0" />
+                      Save
+                    </Button>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 shrink-0" />
+                      Delete account
+                    </Button>
+                  </div>
                   </CardContent>
                 </Card>
               )}
