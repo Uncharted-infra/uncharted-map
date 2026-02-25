@@ -44,13 +44,15 @@ If you believe a design system change is required, you must explain why and ask 
 
 ## Typography
 
-The site uses three fonts:
+The site uses three fonts (from `fonts/`):
 
-**Departure Mono** (`font-departure-mono`) — Titles, button labels, and anything big: navbar branding, sidebar titles, section headings, card titles, major control labels.
+**Departure Mono** (`font-departure-mono`, `fonts/Departure_Mono/DepartureMono-Regular.otf`) — Titles, button labels, section headings, card titles, **all form labels** (e.g. Name, Email, Password in Passport modal), sidebar titles, navbar branding.
 
-**WenKai Mono Bold** (`font-wenkai-mono-bold`) — Everything else: body text, form labels, inputs, placeholders, user messages, and general UI. Use with `placeholder:font-wenkai-mono-bold` for inputs. Applied to `body` by default.
+**WenKai Mono Bold** (`font-wenkai-mono-bold`, `fonts/LXGW_WenKai_Mono_TC/LXGWWenKaiMonoTC-Bold.ttf`) — User input: form inputs, placeholders, dropdown selections, typed content. Use `placeholder:font-wenkai-mono-bold` for inputs. Applied to `body` by default.
 
 **Fenix** (`font-fenix`) — Agent replies only. When the user submits a query, the agent's response uses Fenix so users can distinguish user messages from agent messages.
+
+**Rule:** Labels = Departure Mono. User-typed/selected content = WenKai Mono Bold.
 
 Do not introduce additional fonts.
 
@@ -206,21 +208,28 @@ Three-column structure:
 
 ### Left Sidebar (Persistent Navigation)
 
-Icons use **lucide-react**.
+Icons use **lucide-react**. Sidebar labels use **Departure Mono**.
 
-Top buttons:
+**Routes:**
 
-1. Search — search across trips & conversations  
-2. Trips — active and past trips  
-3. Friends — shared trips & social discovery  
-4. Luggage — saved documents (tickets, reservations, visas)  
-5. Journey — saved places (restaurants, hotels, attractions)
+| Button | Route |
+|--------|-------|
+| New Trip | `/` (home, no subpage) |
+| Search | `/search` |
+| Compass | `/compass` |
+| Trips | `/trip` |
+| Luggage | `/luggage` |
+| Places | `/luggage/places` |
+| Hotels (Luggage) | `/luggage/hotels` |
+| Flights (Luggage) | `/luggage/flights` |
+| Documents | `/documents` |
+| Flights (Documents) | `/documents/flights` |
+| Hotels (Documents) | `/documents/hotels` |
+| Activities | `/documents/activities` |
 
-Bottom:
+Individual trips: `/trip/[id]`
 
-Profile + Settings
-
-Sidebar labels use **Departure Mono**.
+Bottom: Profile + Passport (opens modal)
 
 ---
 

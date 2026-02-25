@@ -54,9 +54,9 @@ const luggageItems = [
 ] as const;
 
 const documentItems = [
-  { icon: Plane, label: "Flights", href: "/passport/flights" },
-  { icon: Building2, label: "Hotels", href: "/passport/hotels" },
-  { icon: Activity, label: "Activities", href: "/passport/activities" },
+  { icon: Plane, label: "Flights", href: "/documents/flights" },
+  { icon: Building2, label: "Hotels", href: "/documents/hotels" },
+  { icon: Activity, label: "Activities", href: "/documents/activities" },
 ] as const;
 
 function SidebarContent({
@@ -77,34 +77,19 @@ function SidebarContent({
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className={cn("flex items-center p-3", isCollapsed ? "justify-center" : "justify-between gap-2")}>
           {isCollapsed ? (
-            <div className="group relative flex w-full items-center justify-center py-1">
-              <Image
-                src="/img/logo/logo.png"
-                alt="Map"
-                width={32}
-                height={32}
-                className="h-8 w-8 shrink-0 object-contain transition-opacity group-hover:opacity-0"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleCollapsed}
-                className="font-departure-mono absolute inset-0 m-auto flex h-8 w-8 shrink-0 items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 border-0 shadow-none hover:bg-transparent"
-                aria-label="Expand sidebar"
-              >
-                <PanelLeftOpen className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCollapsed}
+              className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+              aria-label="Expand sidebar"
+            >
+              <PanelLeftOpen className="h-4 w-4" />
+            </Button>
           ) : (
             <>
-              <Link href="/" onClick={onLinkClick} className="flex items-center min-w-0 shrink-0">
-                <Image
-                  src="/img/logo/logo.png"
-                  alt="Map"
-                  width={120}
-                  height={32}
-                  className="h-8 w-auto max-w-[140px] object-contain"
-                />
+              <Link href="/" onClick={onLinkClick} className="flex items-center min-w-0 shrink-0 font-departure-mono text-base font-semibold">
+                Uncharted
               </Link>
               {!forceExpanded && (
                 <Button
@@ -121,7 +106,7 @@ function SidebarContent({
           )}
         </div>
 
-        <nav className={cn("flex flex-col gap-1 px-2 pb-4", isCollapsed ? "px-2" : "px-4")}>
+        <nav className={cn("flex flex-col gap-1 pb-4", isCollapsed ? "pl-[3px] pr-2" : "pl-[7px] pr-3")}>
           <Button
             variant="ghost"
             className={cn(
@@ -141,11 +126,11 @@ function SidebarContent({
             className={cn(
               "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
               isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
-              pathname === "/" && "bg-transparent"
+              pathname === "/search" && "bg-transparent"
             )}
             asChild
           >
-            <Link href="/" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
+            <Link href="/search" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
               <Search className="h-4 w-4 shrink-0" />
               {!isCollapsed && "Search"}
             </Link>
@@ -159,39 +144,49 @@ function SidebarContent({
             )}
             asChild
           >
-            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Compass" : undefined}>
+            <Link href="/compass" onClick={onLinkClick} title={isCollapsed ? "Compass" : undefined}>
               <Compass className="h-4 w-4 shrink-0" />
               {!isCollapsed && "Compass"}
             </Link>
           </Button>
 
           <div className="flex flex-col gap-0.5">
-            <Button
-              variant="ghost"
-              className={cn(
-                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
-                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
-              )}
-              title={isCollapsed ? "Trips" : undefined}
-              onClick={() => {
-                if (isCollapsed) {
+            {isCollapsed ? (
+              <Button
+                variant="ghost"
+                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
+                title="Trips"
+                onClick={() => {
                   toggleCollapsed();
                   setTripsOpen(true);
-                } else {
-                  setTripsOpen((o) => !o);
-                }
-              }}
-            >
-              <Map className="h-4 w-4 shrink-0" />
-              {!isCollapsed && (
-                <>
-                  <span className="flex-1 text-left">Trips</span>
+                }}
+              >
+                <Map className="h-4 w-4 shrink-0" />
+              </Button>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
+                  asChild
+                >
+                  <Link href="/trip" onClick={onLinkClick} className="flex items-center gap-3">
+                    <Map className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-left">Trips</span>
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+                  onClick={() => setTripsOpen((o) => !o)}
+                >
                   <ChevronDown
                     className={cn("h-4 w-4 shrink-0 transition-transform", tripsOpen && "rotate-180")}
                   />
-                </>
-              )}
-            </Button>
+                </Button>
+              </div>
+            )}
             {!isCollapsed && tripsOpen && (
               <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
                 {PLACEHOLDER_TRIPS.length === 0 ? (
@@ -202,7 +197,7 @@ function SidebarContent({
                   PLACEHOLDER_TRIPS.map((trip) => (
                     <Link
                       key={trip.id}
-                      href={`/trips/${trip.id}`}
+                      href={`/trip/${trip.id}`}
                       onClick={onLinkClick}
                       className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1"
                     >
@@ -215,32 +210,42 @@ function SidebarContent({
           </div>
 
           <div className="flex flex-col gap-0.5">
-            <Button
-              variant="ghost"
-              className={cn(
-                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
-                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
-              )}
-              title={isCollapsed ? "Luggage" : undefined}
-              onClick={() => {
-                if (isCollapsed) {
+            {isCollapsed ? (
+              <Button
+                variant="ghost"
+                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
+                title="Luggage"
+                onClick={() => {
                   toggleCollapsed();
                   setLuggageOpen(true);
-                } else {
-                  setLuggageOpen((o) => !o);
-                }
-              }}
-            >
-              <Briefcase className="h-4 w-4 shrink-0" />
-              {!isCollapsed && (
-                <>
-                  <span className="flex-1 text-left">Luggage</span>
+                }}
+              >
+                <Briefcase className="h-4 w-4 shrink-0" />
+              </Button>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
+                  asChild
+                >
+                  <Link href="/luggage" onClick={onLinkClick} className="flex items-center gap-3">
+                    <Briefcase className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-left">Luggage</span>
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+                  onClick={() => setLuggageOpen((o) => !o)}
+                >
                   <ChevronDown
                     className={cn("h-4 w-4 shrink-0 transition-transform", luggageOpen && "rotate-180")}
                   />
-                </>
-              )}
-            </Button>
+                </Button>
+              </div>
+            )}
             {!isCollapsed && luggageOpen && (
               <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
                 {luggageItems.map((item) => (
@@ -259,32 +264,42 @@ function SidebarContent({
           </div>
 
           <div className="flex flex-col gap-0.5">
-            <Button
-              variant="ghost"
-              className={cn(
-                "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
-                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3 w-full"
-              )}
-              title={isCollapsed ? "Documents" : undefined}
-              onClick={() => {
-                if (isCollapsed) {
+            {isCollapsed ? (
+              <Button
+                variant="ghost"
+                className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-center px-0 w-full"
+                title="Documents"
+                onClick={() => {
                   toggleCollapsed();
                   setDocumentsOpen(true);
-                } else {
-                  setDocumentsOpen((o) => !o);
-                }
-              }}
-            >
-              <FileText className="h-4 w-4 shrink-0" />
-              {!isCollapsed && (
-                <>
-                  <span className="flex-1 text-left">Documents</span>
+                }}
+              >
+                <FileText className="h-4 w-4 shrink-0" />
+              </Button>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200 justify-start gap-3 flex-1 min-w-0"
+                  asChild
+                >
+                  <Link href="/documents" onClick={onLinkClick} className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-left">Documents</span>
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+                  onClick={() => setDocumentsOpen((o) => !o)}
+                >
                   <ChevronDown
                     className={cn("h-4 w-4 shrink-0 transition-transform", documentsOpen && "rotate-180")}
                   />
-                </>
-              )}
-            </Button>
+                </Button>
+              </div>
+            )}
             {!isCollapsed && documentsOpen && (
               <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">
                 {documentItems.map((item) => (
