@@ -24,7 +24,7 @@ import {
   Activity,
   FileText,
 } from "lucide-react";
-import { useSidebar } from "@/contexts/sidebar-context";
+import { useSidebar, SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import { PassportIcon } from "@/components/icons/passport-icon";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -133,9 +133,10 @@ function SidebarContent({
   onOpenSettings,
 }: { onLinkClick?: () => void; forceExpanded?: boolean; onOpenSettings?: () => void }) {
   const pathname = usePathname();
-  const { collapsed, toggleCollapsed } = useSidebar();
+  const { collapsed, toggleCollapsed, sidebarWidth } = useSidebar();
   const { theme, setTheme } = useTheme();
   const isCollapsed = forceExpanded ? false : collapsed;
+  const profileMenuWidth = forceExpanded ? SIDEBAR_WIDTH_EXPANDED : sidebarWidth;
   const [tripsOpen, setTripsOpen] = useState(false);
   const [luggageOpen, setLuggageOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
@@ -297,7 +298,7 @@ function SidebarContent({
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" side="top" className="font-departure-mono">
+            <DropdownMenuContent align="center" side="top" className="font-departure-mono" style={{ width: profileMenuWidth }}>
               <DropdownMenuItem onClick={onOpenSettings}>
                 <PassportIcon />
                 Passport
@@ -313,7 +314,7 @@ function SidebarContent({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-md hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-md hover:opacity-80 transition-opacity focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                     aria-label="Profile menu"
                   >
                     <Avatar className="h-8 w-8 shrink-0">
@@ -331,7 +332,7 @@ function SidebarContent({
                     </div>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="font-departure-mono">
+                <DropdownMenuContent align="start" side="top" className="font-departure-mono -translate-x-[15px]" style={{ width: profileMenuWidth }}>
                   <DropdownMenuItem onClick={onOpenSettings}>
                     <PassportIcon />
                     Passport
