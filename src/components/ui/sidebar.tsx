@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { PrimaryGrowButton } from "@/components/ui/grow-button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -270,18 +270,17 @@ const Sidebar = React.forwardRef<
 Sidebar.displayName = "Sidebar"
 
 const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
+  React.ElementRef<typeof PrimaryGrowButton>,
+  React.ComponentProps<typeof PrimaryGrowButton>
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
 
   return (
-    <Button
+    <PrimaryGrowButton
       ref={ref}
       data-sidebar="trigger"
-      variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-7 w-7 font-departure-mono", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -290,7 +289,7 @@ const SidebarTrigger = React.forwardRef<
     >
       <PanelLeft />
       <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    </PrimaryGrowButton>
   )
 })
 SidebarTrigger.displayName = "SidebarTrigger"

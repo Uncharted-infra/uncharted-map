@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { PrimaryGrowButton, SecondaryGrowButton, DestructiveGrowButton } from "@/components/ui/grow-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -94,7 +94,10 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl w-[95vw] h-[90vh] p-0 gap-0 overflow-hidden flex flex-col [&>button]:right-4 [&>button]:top-4 [&>button]:z-10">
+      <DialogContent
+        className="max-w-6xl w-[95vw] h-[90vh] p-0 gap-0 overflow-hidden flex flex-col [&>button]:right-4 [&>button]:top-4 [&>button]:z-10"
+        overlayClassName="left-1/2 top-1/2 right-auto bottom-auto w-[95vw] max-w-6xl h-[90vh] -translate-x-1/2 -translate-y-1/2"
+      >
         <DialogTitle className="sr-only">Passport</DialogTitle>
         <div className="relative flex-1 min-h-0 flex overflow-hidden">
           <aside className="absolute left-0 top-0 bottom-0 z-10 w-[240px] flex flex-col border-r-2 border-border bg-muted/40">
@@ -172,13 +175,12 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       <Label className="font-departure-mono">Country of Residence</Label>
                       <Popover open={baseCountryOpen} onOpenChange={setBaseCountryOpen}>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
+                          <SecondaryGrowButton
                             className="w-full justify-between font-wenkai-mono-bold h-9"
                           >
                             {baseCountry ?? "Select country"}
                             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
+                          </SecondaryGrowButton>
                         </PopoverTrigger>
                         <PopoverContent
                           className="w-[var(--radix-popover-trigger-width)] max-h-[320px] p-0 overflow-hidden"
@@ -246,8 +248,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       <p className="text-xs text-muted-foreground font-departure-mono whitespace-nowrap">MBTI type – acronym and description</p>
                       <Popover open={personalityOpen} onOpenChange={setPersonalityOpen}>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
+                          <SecondaryGrowButton
                             className="w-full justify-between font-departure-mono h-auto min-h-9 py-2"
                           >
                             {personality ? (
@@ -258,7 +259,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                               <span className="text-muted-foreground">Select personality type</span>
                             )}
                             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
+                          </SecondaryGrowButton>
                         </PopoverTrigger>
                         <PopoverContent
                             className="w-[var(--radix-popover-trigger-width)] max-h-[320px] p-0 overflow-hidden"
@@ -308,14 +309,14 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       </Popover>
                     </div>
                     <div className="flex items-center gap-2">
-                    <Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
+                    <PrimaryGrowButton size="sm" className="bg-green-600 text-white hover:bg-green-700">
                       <Save className="h-4 w-4 shrink-0" />
                       Save
-                    </Button>
-                    <Button variant="destructive" size="sm">
+                    </PrimaryGrowButton>
+                    <DestructiveGrowButton size="sm">
                       <Trash2 className="h-4 w-4 shrink-0" />
                       Delete account
-                    </Button>
+                    </DestructiveGrowButton>
                   </div>
                 </div>
               )}
@@ -341,7 +342,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                       <span className="font-departure-mono">Refill date</span>
                       <span className="font-departure-mono">Tomorrow</span>
                     </div>
-                    <Button>Upgrade plan</Button>
+                    <PrimaryGrowButton>Upgrade plan</PrimaryGrowButton>
                 </div>
               )}
 
@@ -355,9 +356,9 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                           <p className="font-medium font-departure-mono">{item.name}</p>
                           <p className="text-sm text-muted-foreground font-departure-mono">{item.desc}</p>
                         </div>
-                        <Button variant="outline" size="sm" disabled={item.disabled}>
+                        <SecondaryGrowButton size="sm" disabled={item.disabled}>
                           {item.disabled ? "Coming soon" : "Connect"}
-                        </Button>
+                        </SecondaryGrowButton>
                       </div>
                     </div>
                   ))}

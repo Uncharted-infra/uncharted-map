@@ -5,7 +5,7 @@ import {
   PromptInputAction,
   PromptInputTextarea,
 } from "@/components/prompt-kit/prompt-input"
-import { Button } from "@/components/ui/button"
+import { PrimaryGrowButton } from "@/components/ui/grow-button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,9 +67,8 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
+            <PrimaryGrowButton
               type="button"
-              variant="ghost"
               size="sm"
               className="h-8 shrink-0 gap-1.5 rounded-full px-3 font-departure-mono text-sm"
             >
@@ -78,7 +77,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
               {mode === "book" && <CreditCard className="size-4 shrink-0" />}
               {MODE_LABELS[mode]}
               <ChevronDown className="size-4 shrink-0" />
-            </Button>
+            </PrimaryGrowButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="font-departure-mono">
             <DropdownMenuItem
@@ -130,8 +129,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
         <PromptInputAction
           tooltip={isLoading ? "Stop generation" : "Send message"}
         >
-          <Button
-            variant="default"
+          <PrimaryGrowButton
             size="icon"
             className="h-8 w-8 shrink-0 rounded-full"
             onClick={handleSubmit}
@@ -143,7 +141,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
                 <SubmitIcon className="size-4 animate-icon-mode-change" />
               </span>
             )}
-          </Button>
+          </PrimaryGrowButton>
         </PromptInputAction>
       </div>
     </PromptInput>

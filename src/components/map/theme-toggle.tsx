@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Monitor } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PrimaryGrowButton } from "@/components/ui/grow-button";
 import { cn } from "@/lib/utils";
 
 export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
@@ -36,45 +36,42 @@ export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
         collapsed ? "flex-col items-center w-full" : "flex-row shrink-0"
       )}
     >
-      <Button
-        variant="ghost"
+      <PrimaryGrowButton
         size="icon"
         onClick={() => setTheme("light")}
         className={cn(
-          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          "h-8 shrink-0 font-departure-mono",
           collapsed ? "w-8" : "flex-1 min-w-0"
         )}
         aria-label=" Light mode"
         title=" Light"
       >
         <Sun className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
+      </PrimaryGrowButton>
+      <PrimaryGrowButton
         size="icon"
         onClick={() => setTheme("dark")}
         className={cn(
-          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          "h-8 shrink-0 font-departure-mono",
           collapsed ? "w-8" : "flex-1 min-w-0"
         )}
         aria-label="Dark mode"
         title="Dark"
       >
         <Moon className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
+      </PrimaryGrowButton>
+      <PrimaryGrowButton
         size="icon"
         onClick={() => setTheme("system")}
         className={cn(
-          "h-8 shrink-0 border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+          "h-8 shrink-0 font-departure-mono",
           collapsed ? "w-8" : "flex-1 min-w-0"
         )}
         aria-label="System theme"
         title="System"
       >
         <Monitor className="h-4 w-4" />
-      </Button>
+      </PrimaryGrowButton>
     </div>
   );
 }

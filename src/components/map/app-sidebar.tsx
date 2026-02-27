@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { useSidebar, SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import { PassportIcon } from "@/components/icons/passport-icon";
-import { Button } from "@/components/ui/button";
+import { PrimaryGrowButton, SecondaryGrowButton } from "@/components/ui/grow-button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -58,8 +58,6 @@ const documentItems = [
   { icon: Building2, label: "Hotels", href: "/documents/hotels" },
   { icon: Activity, label: "Activities", href: "/documents/activities" },
 ] as const;
-
-const NAV_BTN = "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200";
 
 function ThemeRadioGroup({ theme, setTheme }: { theme: string | undefined; setTheme: (v: string) => void }) {
   return (
@@ -106,21 +104,38 @@ function CollapsibleNavSection({
   return (
     <div className="flex flex-col gap-0.5">
       {isCollapsed ? (
-        <Button variant="ghost" className={`${NAV_BTN} justify-center px-0 w-full`} title={title} onClick={onCollapsedClick}>
+        <PrimaryGrowButton className="font-departure-mono text-sm justify-center px-0 w-full" title={title} onClick={onCollapsedClick}>
           <Icon className="h-4 w-4 shrink-0" />
-        </Button>
+        </PrimaryGrowButton>
       ) : (
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" className={`${NAV_BTN} justify-start gap-3 flex-1 min-w-0`} asChild>
-            <Link href={href} onClick={onLinkClick} className="flex items-center gap-3">
-              <Icon className="h-4 w-4 shrink-0" />
-              <span className="flex-1 text-left">{label}</span>
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent" onClick={onToggle}>
-            <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", open && "rotate-180")} />
-          </Button>
-        </div>
+        <PrimaryGrowButton
+          className="font-departure-mono text-sm justify-start gap-3 w-full"
+          asChild
+        >
+          <Link href={href} onClick={onLinkClick} className="flex items-center gap-3 w-full min-w-0">
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="flex-1 text-left">{label}</span>
+            <span
+              role="button"
+              tabIndex={0}
+              className="flex shrink-0 cursor-pointer p-0.5 -m-0.5 rounded hover:bg-accent/50"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggle();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onToggle();
+                }
+              }}
+            >
+              <ChevronDown className={cn("h-4 w-4 shrink-0 transition-transform", open && "rotate-180")} />
+            </span>
+          </Link>
+        </PrimaryGrowButton>
       )}
       {!isCollapsed && open && <div className="ml-6 flex flex-col gap-0.5 border-l border-border pl-3">{children}</div>}
     </div>
@@ -146,40 +161,37 @@ function SidebarContent({
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className={cn("flex items-center p-3", isCollapsed ? "justify-center" : "justify-between gap-2")}>
           {isCollapsed ? (
-            <Button
-              variant="ghost"
+            <PrimaryGrowButton
               size="icon"
               onClick={toggleCollapsed}
-              className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+              className="font-departure-mono h-8 w-8 shrink-0"
               aria-label="Expand sidebar"
             >
               <PanelLeftOpen className="h-4 w-4" />
-            </Button>
+            </PrimaryGrowButton>
           ) : (
             <>
               <Link href="/" onClick={onLinkClick} className="flex items-center min-w-0 shrink-0 font-departure-mono text-base font-semibold">
                 Uncharted
               </Link>
               {!forceExpanded && (
-                <Button
-                  variant="ghost"
+                <PrimaryGrowButton
                   size="icon"
                   onClick={toggleCollapsed}
-                  className="font-departure-mono h-8 w-8 shrink-0 border-0 shadow-none hover:bg-transparent"
+                  className="font-departure-mono h-8 w-8 shrink-0"
                   aria-label="Collapse sidebar"
                 >
                   <PanelLeftClose className="h-4 w-4" />
-                </Button>
+                </PrimaryGrowButton>
               )}
             </>
           )}
         </div>
 
         <nav className={cn("flex flex-col gap-1 pb-4", isCollapsed ? "pl-[3px] pr-2" : "pl-[7px] pr-3")}>
-          <Button
-            variant="ghost"
+          <PrimaryGrowButton
             className={cn(
-              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              "font-departure-mono text-sm",
               isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
             )}
             asChild
@@ -188,12 +200,11 @@ function SidebarContent({
               <MapPinPlus className="h-4 w-4 shrink-0" />
               {!isCollapsed && "New Trip"}
             </Link>
-          </Button>
+          </PrimaryGrowButton>
 
-          <Button
-            variant="ghost"
+          <PrimaryGrowButton
             className={cn(
-              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              "font-departure-mono text-sm",
               isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
               pathname === "/search" && "bg-transparent"
             )}
@@ -203,12 +214,11 @@ function SidebarContent({
               <Search className="h-4 w-4 shrink-0" />
               {!isCollapsed && "Search"}
             </Link>
-          </Button>
+          </PrimaryGrowButton>
 
-          <Button
-            variant="ghost"
+          <PrimaryGrowButton
             className={cn(
-              "font-departure-mono text-sm border-0 shadow-none hover:bg-transparent hover:shadow-md active:shadow-none transition-shadow duration-200",
+              "font-departure-mono text-sm",
               isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
             )}
             asChild
@@ -217,7 +227,7 @@ function SidebarContent({
               <Compass className="h-4 w-4 shrink-0" />
               {!isCollapsed && "Compass"}
             </Link>
-          </Button>
+          </PrimaryGrowButton>
 
           <CollapsibleNavSection
             icon={Map}
@@ -281,14 +291,13 @@ function SidebarContent({
         </nav>
       </div>
 
-      <div className={cn("shrink-0 border-t border-border", isCollapsed ? "p-2 flex justify-center" : "p-4")}>
+      <div className={cn("shrink-0 border-t border-border", isCollapsed ? "p-2 flex justify-center" : "pl-[0px] pr-3 py-4")}>
         {isCollapsed ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
+              <PrimaryGrowButton
                 suppressHydrationWarning
-                className="h-8 w-8 rounded-full p-0 border-0 shadow-none hover:bg-transparent"
+                className="h-8 w-8 rounded-full p-0 font-departure-mono"
                 aria-label="Profile menu"
               >
                 <Avatar className="h-8 w-8 shrink-0">
@@ -296,7 +305,7 @@ function SidebarContent({
                     AS
                   </AvatarFallback>
                 </Avatar>
-              </Button>
+              </PrimaryGrowButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" side="top" className="font-departure-mono" style={{ width: profileMenuWidth }}>
               <DropdownMenuItem onClick={onOpenSettings}>
@@ -308,15 +317,14 @@ function SidebarContent({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <>
-            <div className="flex items-center gap-3 mb-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-md hover:opacity-80 transition-opacity focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    aria-label="Profile menu"
-                  >
+          <div className="flex flex-col gap-2 w-full">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <PrimaryGrowButton
+                  type="button"
+                  className="flex items-center gap-3 min-w-0 w-full justify-start text-left font-departure-mono px-4"
+                  aria-label="Profile menu"
+                >
                     <Avatar className="h-8 w-8 shrink-0">
                       <AvatarFallback className="bg-primary/20 text-primary text-xs font-medium font-departure-mono">
                         AS
@@ -330,9 +338,9 @@ function SidebarContent({
                         {CURRENT_PLAN.charAt(0).toUpperCase() + CURRENT_PLAN.slice(1)}
                       </p>
                     </div>
-                  </button>
+                  </PrimaryGrowButton>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="font-departure-mono -translate-x-[15px]" style={{ width: profileMenuWidth }}>
+                <DropdownMenuContent align="start" side="top" className="font-departure-mono -translate-x-[0px]" style={{ width: profileMenuWidth }}>
                   <DropdownMenuItem onClick={onOpenSettings}>
                     <PassportIcon />
                     Passport
@@ -341,13 +349,12 @@ function SidebarContent({
                   <ThemeRadioGroup theme={theme} setTheme={setTheme} />
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-            <Button variant="outline" size="sm" className="w-full font-departure-mono" asChild>
-              <Link href="/" onClick={onLinkClick}>
+            <SecondaryGrowButton size="sm" className="w-full font-departure-mono justify-start px-4" asChild>
+              <Link href="/" onClick={onLinkClick} className="flex items-center">
                 Upgrade
               </Link>
-            </Button>
-          </>
+            </SecondaryGrowButton>
+          </div>
         )}
       </div>
     </div>
@@ -378,14 +385,13 @@ export function AppSidebar() {
             className="h-8 w-8 object-contain"
           />
         </Link>
-        <Button
-          variant="ghost"
+        <PrimaryGrowButton
           size="icon"
           onClick={() => setMobileOpen(true)}
           className="font-departure-mono shrink-0"
         >
           <Menu className="h-5 w-5" />
-        </Button>
+        </PrimaryGrowButton>
       </div>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen} modal={false}>

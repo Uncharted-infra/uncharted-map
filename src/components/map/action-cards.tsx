@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin, Plane, Hotel, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PrimaryGrowButton, SecondaryGrowButton } from "@/components/ui/grow-button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -34,9 +34,9 @@ export function DestinationCard({
         <p className="font-wenkai-mono-bold text-xs text-muted-foreground">Best time: {bestTime}</p>
       </CardHeader>
       <CardFooter className="gap-2">
-        <Button size="sm">Plan Trip</Button>
-        <Button size="sm" variant="outline">Save</Button>
-        <Button size="sm" variant="ghost">Compare</Button>
+        <PrimaryGrowButton size="sm">Plan Trip</PrimaryGrowButton>
+        <SecondaryGrowButton size="sm">Save</SecondaryGrowButton>
+        <SecondaryGrowButton size="sm">Compare</SecondaryGrowButton>
       </CardFooter>
     </Card>
   );
@@ -68,7 +68,7 @@ export function FlightOptionCard({
         </p>
       </CardContent>
       <CardFooter>
-        <Button size="sm" className="w-full">Select</Button>
+        <PrimaryGrowButton size="sm" className="w-full">Select</PrimaryGrowButton>
       </CardFooter>
     </Card>
   );
@@ -99,7 +99,7 @@ export function HotelCard({
         <p className="text-xs text-muted-foreground">{amenities.join(" · ")}</p>
       </CardHeader>
       <CardFooter>
-        <Button size="sm" className="w-full">Reserve</Button>
+        <PrimaryGrowButton size="sm" className="w-full">Reserve</PrimaryGrowButton>
       </CardFooter>
     </Card>
   );
@@ -131,7 +131,7 @@ export function ActivityCard({
         </div>
       </CardContent>
       <CardFooter>
-        <Button size="sm" className="w-full">Book</Button>
+        <PrimaryGrowButton size="sm" className="w-full">Book</PrimaryGrowButton>
       </CardFooter>
     </Card>
   );
@@ -181,8 +181,8 @@ export function ConfirmationCard({
         <p className="text-sm text-muted-foreground">{date}</p>
       </CardContent>
       <CardFooter className="gap-2">
-        <Button size="sm" variant="outline">Add to calendar</Button>
-        <Button size="sm" variant="outline">Download PDF</Button>
+        <SecondaryGrowButton size="sm">Add to calendar</SecondaryGrowButton>
+        <SecondaryGrowButton size="sm">Download PDF</SecondaryGrowButton>
       </CardFooter>
     </Card>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { Map, Share2, FileDown, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SecondaryGrowButton } from "@/components/ui/grow-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -103,18 +103,18 @@ export function ContextPanel({ className }: { className?: string }) {
           </Card>
 
           <div className="space-y-2">
-            <Button variant="outline" className="w-full justify-start gap-2" size="sm">
+            <SecondaryGrowButton className="w-full justify-start gap-2" size="sm">
               <Share2 className="h-4 w-4" />
               Invite collaborators
-            </Button>
-            <Button variant="outline" className="w-full justify-start gap-2" size="sm">
+            </SecondaryGrowButton>
+            <SecondaryGrowButton className="w-full justify-start gap-2" size="sm">
               <FileDown className="h-4 w-4" />
               Export itinerary PDF
-            </Button>
-            <Button variant="outline" className="w-full justify-start gap-2" size="sm">
+            </SecondaryGrowButton>
+            <SecondaryGrowButton className="w-full justify-start gap-2" size="sm">
               <MessageCircle className="h-4 w-4" />
               Message Map about this trip
-            </Button>
+            </SecondaryGrowButton>
           </div>
         </div>
       </ScrollArea>
