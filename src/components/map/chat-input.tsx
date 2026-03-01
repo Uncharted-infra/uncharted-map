@@ -38,7 +38,7 @@ function getContextualPlaceholder(mode: ChatMode, selectedCountry: string): stri
     case "plan":
       return `What do you want to do when you reach ${selectedCountry}?`
     case "book":
-      return "How do you want to get there?"
+      return `How do you want to travel to ${selectedCountry}?`
     default:
       return MODE_PLACEHOLDERS[mode]
   }
