@@ -396,16 +396,18 @@ export function AppSidebar() {
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen} modal={false}>
         <SheetContent side="left" className="w-[260px] p-0 flex flex-col">
-          <div className="flex flex-1 flex-col overflow-hidden font-departure-mono pt-4">
-            <SidebarContent
-              onLinkClick={() => setMobileOpen(false)}
-              forceExpanded
-              onOpenSettings={() => {
-                setMobileOpen(false)
-                setSettingsOpen(true)
-              }}
-            />
-          </div>
+          {mobileOpen && (
+            <div className="flex flex-1 flex-col overflow-hidden font-departure-mono pt-4">
+              <SidebarContent
+                onLinkClick={() => setMobileOpen(false)}
+                forceExpanded
+                onOpenSettings={() => {
+                  setMobileOpen(false)
+                  setSettingsOpen(true)
+                }}
+              />
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 

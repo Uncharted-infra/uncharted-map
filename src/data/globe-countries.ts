@@ -167,7 +167,7 @@ export const COUNTRY_ISO_TO_NAME: Record<string, string> = {
   UGA: "Uganda",
   UKR: "Ukraine",
   URY: "Uruguay",
-  USA: "United States",
+  USA: "United States of America",
   UZB: "Uzbekistan",
   VEN: "Venezuela",
   VNM: "Vietnam",

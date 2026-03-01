@@ -20,7 +20,7 @@ export const COUNTRIES = [
   "Romania", "Russia", "Rwanda",
   "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "São Tomé and Príncipe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
   "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Türkiye", "Turkmenistan", "Tuvalu",
-  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan",
   "Vanuatu", "Venezuela", "Vietnam",
   "Yemen",
   "Zambia", "Zimbabwe",
@@ -91,7 +91,7 @@ export const COUNTRY_PHONE_FORMATS: Record<string, { code: string; segments: num
   "Trinidad and Tobago": { code: "+1-868", segments: [3, 3, 4] }, "Tunisia": { code: "+216", segments: [2, 3, 3] }, "Türkiye": { code: "+90", segments: [3, 3, 4] },
   "Turkmenistan": { code: "+993", segments: [2, 5] }, "Tuvalu": { code: "+688", segments: [2, 4] }, "Uganda": { code: "+256", segments: [3, 3, 3] },
   "Ukraine": { code: "+380", segments: [2, 3, 4] }, "United Arab Emirates": { code: "+971", segments: [2, 3, 4] }, "United Kingdom": { code: "+44", segments: [4, 6] },
-  "United States": { code: "+1", segments: [3, 3, 4] }, "Uruguay": { code: "+598", segments: [1, 3, 4] }, "Uzbekistan": { code: "+998", segments: [2, 3, 4] },
+  "United States of America": { code: "+1", segments: [3, 3, 4] }, "Uruguay": { code: "+598", segments: [1, 3, 4] }, "Uzbekistan": { code: "+998", segments: [2, 3, 4] },
   "Vanuatu": { code: "+678", segments: [3, 4] }, "Venezuela": { code: "+58", segments: [3, 3, 4] }, "Vietnam": { code: "+84", segments: [3, 3, 4] },
   "Yemen": { code: "+967", segments: [3, 3, 3] }, "Zambia": { code: "+260", segments: [2, 3, 4] }, "Zimbabwe": { code: "+263", segments: [2, 3, 4] },
 };

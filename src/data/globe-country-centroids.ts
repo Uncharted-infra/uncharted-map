@@ -168,7 +168,7 @@ export const COUNTRY_CENTROIDS: Record<string, [number, number]> = {
   Uganda: [33, 1],
   Ukraine: [32, 49],
   Uruguay: [-56, -33],
-  "United States": [-98, 38],
+  "United States of America": [-98, 38],
   Uzbekistan: [64, 41],
   Venezuela: [-66, 6],
   Vietnam: [108, 16],
