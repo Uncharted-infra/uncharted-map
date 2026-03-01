@@ -119,15 +119,16 @@ export function ChatInput({
   const SubmitIcon = showModeSelector ? MODE_SUBMIT_ICONS[mode] : Send
 
   const countrySuggestions = useMemo(
-    () =>
-      !showModeSelector && inputValue.trim()
-        ? getMatchingCountries(inputValue)
-        : [],
-    [showModeSelector, inputValue]
+    () => (inputValue.trim() ? getMatchingCountries(inputValue) : []),
+    [inputValue]
   )
 
   const handleSelectCountry = (country: string) => {
-    setInputValue(country)
+    if (onCountrySelect) {
+      onCountrySelect(country)
+    } else {
+      setInputValue(country)
+    }
   }
 
   return (

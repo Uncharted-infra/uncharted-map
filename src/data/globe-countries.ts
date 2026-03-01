@@ -228,6 +228,8 @@ export function findMatchingCountry(input: string): string | null {
 
 /**
  * Get all country names that start with the input (case-insensitive).
+ * First character: all countries starting with that letter.
+ * More characters: narrows the list (e.g. "R" → Russia, Rwanda...; "Ru" → Russia, Rwanda).
  * Returns matches sorted alphabetically.
  */
 export function getMatchingCountries(input: string): string[] {
@@ -235,7 +237,7 @@ export function getMatchingCountries(input: string): string[] {
   if (!trimmed) return [];
 
   const lower = trimmed.toLowerCase();
-  return COUNTRY_NAMES.filter((c) => c.toLowerCase().startsWith(lower)).sort((a, b) =>
-    a.localeCompare(b)
+  return COUNTRY_NAMES.filter((c) => c.toLowerCase().startsWith(lower)).sort(
+    (a, b) => a.localeCompare(b)
   );
 }

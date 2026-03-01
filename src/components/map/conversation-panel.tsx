@@ -116,6 +116,7 @@ export function ConversationPanel({ className }: { className?: string }) {
               value={exploreInput}
               showModeSelector={true}
               selectedCountry={selectedCountry}
+              onCountrySelect={handleCountrySelect}
             />
           </div>
           {selectedCountry && (
