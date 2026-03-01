@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { ChatInput, type ChatMode } from "./chat-input";
 import { ExploreGlobe } from "./explore-globe";
-import { Button } from "@/components/ui/button";
 import { findMatchingCountry, COUNTRY_NAMES } from "@/data/globe-countries";
 import { getChatState, setChatState } from "@/lib/chat-state";
 import { cn } from "@/lib/utils";
@@ -72,27 +71,20 @@ export function ConversationPanel({ className }: { className?: string }) {
     return (
       <div className={cn("flex flex-col h-full bg-background p-4", className)}>
         <div className="flex-1 min-h-0" />
-        <div className="flex items-center gap-2 w-full max-w-[calc(42rem+8rem)] mx-auto">
-          <div className="flex-1 min-w-0 max-w-2xl">
+        <div className="flex items-center gap-2 w-full max-w-[calc(48rem+8rem)] mx-auto">
+          <div className="flex-1 min-w-0 max-w-3xl">
             <ChatInput
               onSend={handleSend}
               mode={mode}
               onModeChange={handleModeChange}
               onInputChange={setExploreInput}
+              value={exploreInput}
               showModeSelector={!!selectedCountry}
               selectedCountry={selectedCountry}
+              onCountrySelect={handleCountrySelect}
+              onChangeDestination={handleChangeDestination}
             />
           </div>
-          {selectedCountry && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleChangeDestination}
-              className="shrink-0 cursor-pointer"
-            >
-              Change destination
-            </Button>
-          )}
         </div>
       </div>
     );
@@ -106,8 +98,8 @@ export function ConversationPanel({ className }: { className?: string }) {
       )}
     >
       <div className="flex min-h-0 flex-col justify-start">
-        <div className="w-full max-w-[calc(42rem+8rem)] mx-auto mb-4 shrink-0 flex items-center gap-2">
-          <div className="flex-1 min-w-0 max-w-2xl">
+        <div className="w-full max-w-[calc(48rem+8rem)] mx-auto mb-4 shrink-0 flex items-center gap-2">
+          <div className="flex-1 min-w-0 max-w-3xl">
             <ChatInput
               onSend={handleSend}
               mode={mode}
@@ -117,31 +109,22 @@ export function ConversationPanel({ className }: { className?: string }) {
               showModeSelector={true}
               selectedCountry={selectedCountry}
               onCountrySelect={handleCountrySelect}
+              onChangeDestination={handleChangeDestination}
             />
           </div>
-          {selectedCountry && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleChangeDestination}
-              className="shrink-0 cursor-pointer"
-            >
-              Change destination
-            </Button>
-          )}
         </div>
       </div>
       <div className="min-h-0 flex flex-col items-center justify-center overflow-hidden">
-        <div className="flex items-center justify-center mb-2 mt-[60px] font-departure-mono text-foreground text-[0.875rem]">
-          <span>Drag to rotate · Click to select</span>
-        </div>
-        <div className="w-full max-w-2xl h-full flex-1 min-h-0">
+        <div className="w-full max-w-3xl h-full flex-1 min-h-0">
           <ExploreGlobe
             className="w-full h-full"
             highlightedCountry={highlightedCountry}
             centerOnCountry={centerOnCountry}
             onCountrySelect={handleCountrySelect}
           />
+        </div>
+        <div className="flex items-center justify-center mt-2 mb-2 font-departure-mono text-foreground text-[0.875rem] shrink-0">
+          <span>Drag to rotate · Click to select</span>
         </div>
       </div>
     </div>

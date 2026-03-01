@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Compass, Map, CreditCard, ChevronDown, Square, Send, Telescope, Notebook, Receipt } from "lucide-react"
+import { Compass, Map, CreditCard, ChevronDown, Square, Send, Telescope, Notebook, Receipt, Check, Pen } from "lucide-react"
 import { useState, useMemo } from "react"
 import { getMatchingCountries, findMatchingCountry } from "@/data/globe-countries"
 import { cn } from "@/lib/utils"
@@ -44,6 +44,19 @@ function getContextualPlaceholder(mode: ChatMode, selectedCountry: string): stri
   }
 }
 
+function getContextualPlaceholderParts(mode: ChatMode): { prefix: string; suffix: string } {
+  switch (mode) {
+    case "explore":
+      return { prefix: "What would you like to know about ", suffix: " ?" }
+    case "plan":
+      return { prefix: "What do you want to do when you reach ", suffix: " ?" }
+    case "book":
+      return { prefix: "How do you want to travel to ", suffix: " ?" }
+    default:
+      return { prefix: "", suffix: "" }
+  }
+}
+
 const MODE_SUBMIT_ICONS: Record<ChatMode, typeof Telescope> = {
   explore: Telescope,
   plan: Notebook,
@@ -59,6 +72,7 @@ export function ChatInput({
   showModeSelector = true,
   selectedCountry = null,
   onCountrySelect,
+  onChangeDestination,
 }: {
   onSend?: (message: string) => void
   mode?: ChatMode
@@ -68,6 +82,7 @@ export function ChatInput({
   showModeSelector?: boolean
   selectedCountry?: string | null
   onCountrySelect?: (country: string) => void
+  onChangeDestination?: () => void
 }) {
   const [input, setInput] = useState("")
   const isControlled = valueProp !== undefined
@@ -200,7 +215,35 @@ export function ChatInput({
               className="pointer-events-none absolute inset-0 z-10 flex items-center px-2 py-1 text-base text-muted-foreground md:text-sm font-wenkai-mono-bold select-none animate-icon-mode-change"
               aria-hidden
             >
-              {placeholder}
+              {showModeSelector && selectedCountry ? (
+                <>
+                  <span className="pointer-events-none">{getContextualPlaceholderParts(mode).prefix}</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="pointer-events-auto mx-1 inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/50 px-2 py-0.5 font-wenkai-mono-bold text-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        {selectedCountry}
+                        <ChevronDown className="size-3.5 shrink-0 opacity-70" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="font-departure-mono">
+                      <DropdownMenuItem onClick={() => {}}>
+                        <Check className="size-4" />
+                        Confirm
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onChangeDestination?.()}>
+                        <Pen className="size-4" />
+                        Change destination
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <span className="pointer-events-none">{getContextualPlaceholderParts(mode).suffix}</span>
+                </>
+              ) : (
+                <span className="pointer-events-none">{placeholder}</span>
+              )}
             </div>
           )}
         </div>
