@@ -59,12 +59,15 @@ const config: Config = {
   					opacity: '1',
   					transform: 'translateY(0)'
   				}
-  			}
+  			},
   		},
   		animation: {
   			'fade-slide-up': 'fade-slide-up 0.3s ease-out',
   			'slide-in-right': 'slide-in-right 0.3s ease-out',
   			'icon-mode-change': 'icon-mode-change 0.25s ease-out'
+  		},
+  		transitionTimingFunction: {
+  			'smooth': 'cubic-bezier(0.22, 1, 0.36, 1)',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

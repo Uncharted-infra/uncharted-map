@@ -13,9 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Compass, Map, CreditCard, ChevronDown, Square, Telescope, Notebook, Receipt } from "lucide-react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { getMatchingCountries } from "@/data/globe-countries"
+import { cn } from "@/lib/utils"
 
-type ChatMode = "explore" | "plan" | "book"
+export type ChatMode = "explore" | "plan" | "book"
 
 const MODE_LABELS: Record<ChatMode, string> = {
   explore: "Explore",
@@ -35,36 +37,68 @@ const MODE_SUBMIT_ICONS: Record<ChatMode, typeof Telescope> = {
   book: Receipt,
 }
 
-export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
+export function ChatInput({
+  onSend,
+  mode: modeProp,
+  onModeChange,
+  onInputChange,
+  value: valueProp,
+}: {
+  onSend?: (message: string) => void
+  mode?: ChatMode
+  onModeChange?: (mode: ChatMode) => void
+  onInputChange?: (value: string) => void
+  value?: string
+}) {
   const [input, setInput] = useState("")
+  const isControlled = valueProp !== undefined
+  const inputValue = isControlled ? valueProp : input
   const [isLoading, setIsLoading] = useState(false)
-  const [mode, setMode] = useState<ChatMode>("explore")
+  const [internalMode, setInternalMode] = useState<ChatMode>("explore")
+  const mode = modeProp ?? internalMode
+  const setMode = onModeChange ?? setInternalMode
 
   const placeholder = MODE_PLACEHOLDERS[mode]
 
   const handleSubmit = () => {
-    if (input.trim()) {
+    if (inputValue.trim()) {
       setIsLoading(true)
-      onSend?.(input.trim())
+      onSend?.(inputValue.trim())
       setTimeout(() => {
         setIsLoading(false)
-        setInput("")
+        if (!isControlled) setInput("")
+        onInputChange?.("")
       }, 500)
     }
   }
 
+  const setInputValue = (v: string) => {
+    if (!isControlled) setInput(v)
+    onInputChange?.(v)
+  }
+
   const SubmitIcon = MODE_SUBMIT_ICONS[mode]
+
+  const countrySuggestions = useMemo(
+    () => (mode === "explore" && inputValue.trim() ? getMatchingCountries(inputValue) : []),
+    [mode, inputValue]
+  )
+
+  const handleSelectCountry = (country: string) => {
+    setInputValue(country)
+  }
 
   return (
     <PromptInput
-      value={input}
-      onValueChange={setInput}
+      value={inputValue}
+      onValueChange={setInputValue}
       isLoading={isLoading}
       onSubmit={handleSubmit}
       maxHeight={120}
       className="w-full"
     >
-      <div className="flex items-center gap-2">
+      <div className="relative flex flex-col">
+        <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <PrimaryGrowButton
@@ -83,7 +117,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             <DropdownMenuItem
               onClick={() => {
                 setMode("explore")
-                setInput("")
+                setInputValue("")
               }}
             >
               <Compass className="size-4" />
@@ -92,7 +126,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             <DropdownMenuItem
               onClick={() => {
                 setMode("plan")
-                setInput("")
+                setInputValue("")
               }}
             >
               <Map className="size-4" />
@@ -101,7 +135,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             <DropdownMenuItem
               onClick={() => {
                 setMode("book")
-                setInput("")
+                setInputValue("")
               }}
             >
               <CreditCard className="size-4" />
@@ -115,7 +149,7 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             placeholder=""
             className="min-h-[24px] min-w-0 flex-1 py-0 bg-transparent"
           />
-          {!input && (
+          {!inputValue && (
             <div
               key={mode}
               className="pointer-events-none absolute inset-0 z-10 flex items-center px-2 py-1 text-base text-muted-foreground md:text-sm font-wenkai-mono-bold select-none animate-icon-mode-change"
@@ -143,6 +177,32 @@ export function ChatInput({ onSend }: { onSend?: (message: string) => void }) {
             )}
           </PrimaryGrowButton>
         </PromptInputAction>
+        </div>
+
+        {mode === "explore" && countrySuggestions.length > 0 && (
+          <div
+            className={cn(
+              "absolute top-full left-0 right-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border bg-popover py-1 shadow-md",
+              "font-departure-mono"
+            )}
+          >
+            {countrySuggestions.slice(0, 12).map((country) => (
+              <button
+                key={country}
+                type="button"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                onClick={() => handleSelectCountry(country)}
+              >
+                {country}
+              </button>
+            ))}
+            {countrySuggestions.length > 12 && (
+              <div className="px-4 py-2 text-xs text-muted-foreground">
+                +{countrySuggestions.length - 12} more
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </PromptInput>
   )
