@@ -199,12 +199,12 @@ export function ExploreGlobe({
       >
         <Sphere
           id="sphere"
-          fill="hsl(0 0% 14.9% / 0.3)"
-          stroke="hsl(0 0% 14.9% / 0.5)"
+          fill="hsl(var(--globe-sphere-fill))"
+          stroke="hsl(var(--globe-sphere-stroke))"
           strokeWidth={0.5}
         />
         <Graticule
-          stroke="hsl(0 0% 14.9% / 0.3)"
+          stroke="hsl(var(--globe-graticule))"
           strokeWidth={0.3}
         />
         <Geographies geography={GEO_URL}>
@@ -215,13 +215,13 @@ export function ExploreGlobe({
                 highlightedCountry === name || (!highlightedCountry && selectedCountry === name);
               const baseFill = isHighlighted
                 ? "hsl(var(--globe-highlight))"
-                : "hsl(0 0% 14.9% / 0.6)";
+                : "hsl(var(--globe-country-fill))";
               const strokeColor = isHighlighted
                 ? "hsl(var(--globe-highlight))"
-                : "hsl(0 0% 14.9% / 0.6)";
+                : "hsl(var(--globe-country-stroke))";
               const hoverFill = isHighlighted
                 ? "hsl(var(--globe-highlight-hover))"
-                : "hsl(0 0% 14.9%)";
+                : "hsl(var(--globe-country-hover))";
               return (
                 <Geography
                   key={geo.rsmKey}
@@ -264,9 +264,6 @@ export function ExploreGlobe({
           </div>
         );
       })()}
-      <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-muted-foreground font-departure-mono">
-        Drag to rotate · Click to select
-      </p>
     </div>
   );
 }

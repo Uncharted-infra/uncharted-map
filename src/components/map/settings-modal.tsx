@@ -163,7 +163,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                         <p className="text-xs text-destructive font-departure-mono">Password does not meet requirements</p>
                       )}
                       {passwordValid && password && (
-                        <div className="flex items-center gap-2 text-green-600 dark:text-green-500">
+                        <div className="flex items-center gap-2 text-green-600">
                           <Check className="h-4 w-4 shrink-0" />
                           <span className="text-xs font-departure-mono" title="password is good to go!">
                             password is good to go!

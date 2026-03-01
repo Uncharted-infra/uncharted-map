@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Compass, Map, CreditCard, ChevronDown, Square, Telescope, Notebook, Receipt } from "lucide-react"
+import { Compass, Map, CreditCard, ChevronDown, Square, Send, Telescope, Notebook, Receipt } from "lucide-react"
 import { useState, useMemo } from "react"
 import { getMatchingCountries, findMatchingCountry } from "@/data/globe-countries"
 import { cn } from "@/lib/utils"
@@ -116,7 +116,7 @@ export function ChatInput({
     onInputChange?.(v)
   }
 
-  const SubmitIcon = MODE_SUBMIT_ICONS[mode]
+  const SubmitIcon = showModeSelector ? MODE_SUBMIT_ICONS[mode] : Send
 
   const countrySuggestions = useMemo(
     () =>

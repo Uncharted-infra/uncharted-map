@@ -39,6 +39,12 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     --globe-highlight: 45 93% 47%;
     --globe-highlight-hover: 45 93% 55%;
+    --globe-sphere-fill: 0 0% 40% / 0.2;
+    --globe-sphere-stroke: 0 0% 40% / 0.4;
+    --globe-graticule: 0 0% 40% / 0.2;
+    --globe-country-fill: 0 0% 40% / 0.5;
+    --globe-country-stroke: 0 0% 40% / 0.5;
+    --globe-country-hover: 0 0% 25%;
   }
 
   .dark {
@@ -76,6 +82,12 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     --globe-highlight: 45 93% 52%;
     --globe-highlight-hover: 45 93% 60%;
+    --globe-sphere-fill: 0 0% 14.9% / 0.3;
+    --globe-sphere-stroke: 0 0% 14.9% / 0.5;
+    --globe-graticule: 0 0% 14.9% / 0.3;
+    --globe-country-fill: 0 0% 14.9% / 0.6;
+    --globe-country-stroke: 0 0% 14.9% / 0.6;
+    --globe-country-hover: 0 0% 14.9%;
   }
 }
 

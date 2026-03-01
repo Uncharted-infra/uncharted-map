@@ -19,11 +19,7 @@ const PrimaryGrowButton = React.forwardRef<HTMLButtonElement, GrowButtonProps>(
       className={cn(
         'rounded-lg duration-200 ease-in-out active:-translate-x-0.5 active:translate-y-0.5',
 
-        // Light theme: light/white button with dark text
         'bg-card text-card-foreground border-0 shadow-none hover:bg-accent hover:text-accent-foreground',
-
-        // Dark theme: dark button with light text
-        'dark:bg-card dark:text-card-foreground dark:hover:bg-accent dark:hover:text-accent-foreground',
 
         // size-based adjustments
         size === 'lg' && 'text-base has-[>svg]:px-6',
@@ -48,11 +44,7 @@ const SecondaryGrowButton = React.forwardRef<HTMLButtonElement, GrowButtonProps>
       className={cn(
         'cursor-pointer rounded-lg active:scale-95',
 
-        // Light theme: light/white button with dark text
         'bg-card text-card-foreground border-0 hover:bg-accent hover:text-accent-foreground',
-
-        // Dark theme: dark button with light text
-        'dark:bg-card dark:text-card-foreground dark:hover:bg-accent dark:hover:text-accent-foreground',
 
         // size-based adjustments
         size === 'lg' && 'text-base has-[>svg]:px-6',
