@@ -73,6 +73,8 @@ export function ChatInput({
   selectedCountry = null,
   onCountrySelect,
   onChangeDestination,
+  onConfirmDestination,
+  isConfirmed = false,
 }: {
   onSend?: (message: string) => void
   mode?: ChatMode
@@ -83,6 +85,8 @@ export function ChatInput({
   selectedCountry?: string | null
   onCountrySelect?: (country: string) => void
   onChangeDestination?: () => void
+  onConfirmDestination?: () => void
+  isConfirmed?: boolean
 }) {
   const [input, setInput] = useState("")
   const isControlled = valueProp !== undefined
@@ -218,27 +222,31 @@ export function ChatInput({
               {showModeSelector && selectedCountry ? (
                 <>
                   <span className="pointer-events-none">{getContextualPlaceholderParts(mode).prefix}</span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className="pointer-events-auto mx-1 inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/50 px-2 py-0.5 font-wenkai-mono-bold text-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                      >
-                        {selectedCountry}
-                        <ChevronDown className="size-3.5 shrink-0 opacity-70" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="font-departure-mono">
-                      <DropdownMenuItem onClick={() => {}}>
-                        <Check className="size-4" />
-                        Confirm
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onChangeDestination?.()}>
-                        <Pen className="size-4" />
-                        Change destination
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {isConfirmed ? (
+                    <span className="pointer-events-none mx-1 font-wenkai-mono-bold text-foreground">{selectedCountry}</span>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          className="pointer-events-auto mx-1 inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/50 px-2 py-0.5 font-wenkai-mono-bold text-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        >
+                          {selectedCountry}
+                          <ChevronDown className="size-3.5 shrink-0 opacity-70" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="font-departure-mono">
+                        <DropdownMenuItem onClick={() => onConfirmDestination?.()}>
+                          <Check className="size-4" />
+                          Confirm
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onChangeDestination?.()}>
+                          <Pen className="size-4" />
+                          Change destination
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <span className="pointer-events-none">{getContextualPlaceholderParts(mode).suffix}</span>
                 </>
               ) : (

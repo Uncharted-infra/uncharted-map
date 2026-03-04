@@ -30,11 +30,13 @@ export function ExploreGlobe({
   highlightedCountry,
   centerOnCountry,
   onCountrySelect,
+  isConfirmed = false,
 }: {
   className?: string;
   highlightedCountry?: string | null;
   centerOnCountry?: string | null;
   onCountrySelect?: (country: string) => void;
+  isConfirmed?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   const [rotation, setRotation] = useState<[number, number, number]>([-10, -20, 0]);
@@ -213,14 +215,21 @@ export function ExploreGlobe({
               const name = getCountryName(geo);
               const isHighlighted =
                 highlightedCountry === name || (!highlightedCountry && selectedCountry === name);
+              const useConfirmedColor = isHighlighted && isConfirmed;
               const baseFill = isHighlighted
-                ? "hsl(var(--globe-highlight))"
+                ? useConfirmedColor
+                  ? "hsl(var(--globe-highlight-confirmed))"
+                  : "hsl(var(--globe-highlight))"
                 : "hsl(var(--globe-country-fill))";
               const strokeColor = isHighlighted
-                ? "hsl(var(--globe-highlight))"
+                ? useConfirmedColor
+                  ? "hsl(var(--globe-highlight-confirmed))"
+                  : "hsl(var(--globe-highlight))"
                 : "hsl(var(--globe-country-stroke))";
               const hoverFill = isHighlighted
-                ? "hsl(var(--globe-highlight-hover))"
+                ? useConfirmedColor
+                  ? "hsl(var(--globe-highlight-confirmed-hover))"
+                  : "hsl(var(--globe-highlight-hover))"
                 : "hsl(var(--globe-country-hover))";
               return (
                 <Geography
