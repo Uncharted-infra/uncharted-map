@@ -373,3 +373,27 @@ Ask which mode:
 **2 — SMALL CHANGE:** one question per review section  
 
 Do not assume priorities or timelines.
+
+---
+
+## Cursor Cloud specific instructions
+
+This is a single Next.js 15 frontend application (no backend, no database, no Docker).
+
+**Services:**
+
+| Service | Command | URL |
+|---------|---------|-----|
+| Dev server | `pnpm dev` | http://localhost:3000 |
+
+**Quick reference (standard commands in `package.json`):**
+- Lint: `pnpm lint`
+- Build: `pnpm build`
+- Dev: `pnpm dev` (uses Turbopack)
+
+**Non-obvious notes:**
+- The repo ships with both `pnpm-lock.yaml` and `package-lock.json`. Always use **pnpm** (matching the lockfile).
+- `pnpm install` may warn about ignored build scripts for `msw`, `sharp`, and `unrs-resolver`. These warnings are safe to ignore for development; the dev server and build work fine without them.
+- ESLint config (`.eslintrc.json`) must exist for `pnpm lint` to work. If missing, create it with `{"extends": ["next/core-web-vitals", "next/typescript"]}`.
+- All state is stored in `localStorage`; there are no API calls or external services to configure.
+- The interactive globe fetches TopoJSON from `cdn.jsdelivr.net` at runtime; it needs outbound network access.
