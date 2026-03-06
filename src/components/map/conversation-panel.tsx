@@ -1,19 +1,45 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { GripVertical, Earth } from "lucide-react";
-import { ChatInput, type ChatMode } from "./chat-input";
+import dynamic from "next/dynamic";
+import { Earth } from "lucide-react";
+import type { ChatMode } from "./chat-input";
+
+const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full min-w-0 max-w-full flex flex-col min-h-0 overflow-hidden rounded-full border border-border bg-card px-4 py-2.5 shadow-sm animate-pulse">
+      <div className="h-9 bg-muted/50 rounded-md" />
+    </div>
+  ),
+});
 import { ExploreGlobe } from "./explore-globe";
 import { findMatchingCountry, COUNTRY_NAMES } from "@/data/globe-countries";
 import { getChatState, setChatState } from "@/lib/chat-state";
+import { useTrips } from "@/contexts/trips-context";
+import { useNewTrip } from "@/contexts/new-trip-context";
+import {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageAvatar,
+  MessageContent,
+} from "@/components/prompt-kit/message";
+import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Check, Copy, ThumbsDown, ThumbsUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ConversationPanel({ className }: { className?: string }) {
+  const { addTrip } = useTrips();
+  const newTrip = useNewTrip();
   const [hasMessages, setHasMessages] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [mode, setMode] = useState<ChatMode>("explore");
   const [exploreInput, setExploreInput] = useState("");
+  const [liked, setLiked] = useState<boolean | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const stored = getChatState();
@@ -22,6 +48,16 @@ export function ConversationPanel({ className }: { className?: string }) {
       setMode(stored.mode);
     }
   }, []);
+
+  useEffect(() => {
+    if (newTrip?.resetKey) {
+      setHasMessages(false);
+      setIsConfirmed(false);
+      setSelectedCountry(null);
+      setMode("explore");
+      setExploreInput("");
+    }
+  }, [newTrip?.resetKey]);
 
   const handleSend = (message: string) => {
     setHasMessages(true);
@@ -38,20 +74,22 @@ export function ConversationPanel({ className }: { className?: string }) {
 
   const handleCountrySelect = (country: string) => {
     const value = country.trim() || null;
+    if (!value) return;
     setSelectedCountry(value);
     setChatState(value, mode);
     setExploreInput("");
-  };
-
-  const handleChangeDestination = () => {
-    setSelectedCountry(null);
-    setChatState(null, mode);
-    setExploreInput("");
-    setIsConfirmed(false);
-  };
-
-  const handleConfirmDestination = () => {
+    addTrip(value, mode);
     setIsConfirmed(true);
+  };
+
+  const AGENT_MESSAGE_TEXT =
+    "I can help with a variety of tasks: answering questions, providing information, assisting with coding, generating creative content. What would you like help with today?";
+
+  const handleCopyAgentMessage = () => {
+    navigator.clipboard.writeText(AGENT_MESSAGE_TEXT).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const GLOBE_PANEL_MIN_PX = 280;
@@ -129,10 +167,82 @@ export function ConversationPanel({ className }: { className?: string }) {
         >
           <Earth className="h-5 w-5 shrink-0" />
         </button>
-        <div className="flex-1 min-w-0 flex flex-col min-h-0 transition-all duration-500 ease-smooth animate-in slide-in-from-top-4 fade-in-0">
-          <div className="flex-1 min-h-0 overflow-auto" />
-          <div className="w-full max-w-[calc(48rem+8rem)] mx-auto mt-4 shrink-0 flex flex-col gap-3">
-            <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col min-h-0 transition-all duration-500 ease-smooth animate-in slide-in-from-top-4 fade-in-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-auto min-w-0 flex flex-col items-center">
+            <TooltipProvider delayDuration={0}>
+              <div className="flex flex-col gap-8 w-full min-w-0 max-w-2xl px-4 py-6 mx-auto">
+                <Message className="justify-end min-w-0 w-full max-w-full">
+                  <MessageContent className="min-w-0">
+                    {selectedCountry
+                      ? `I'd like to explore ${selectedCountry}`
+                      : "Hello! How can I help you today?"}
+                  </MessageContent>
+                </Message>
+
+                <Message className="justify-start items-center min-w-0 w-full max-w-full">
+                  <MessageAvatar src="/img/logo/logo.png" alt="Uncharted" fallback="U" className="self-center shrink-0 -mt-[45px]" />
+                  <div className="flex w-full min-w-0 flex-col gap-2">
+                    <MessageContent markdown className="bg-transparent p-0 font-fenix min-w-0">
+                      {AGENT_MESSAGE_TEXT}
+                    </MessageContent>
+
+                    <MessageActions className="self-end">
+                      <MessageAction tooltip={copied ? "Copied!" : "Copy to clipboard"}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full transition-colors duration-150 ease-out"
+                          onClick={handleCopyAgentMessage}
+                        >
+                          {copied ? (
+                            <Check className="size-4 text-green-500 transition-colors duration-200" />
+                          ) : (
+                            <Copy className="size-4" />
+                          )}
+                        </Button>
+                      </MessageAction>
+
+                      <MessageAction tooltip="Helpful">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
+                            liked === true && "bg-green-100 text-green-500 dark:bg-green-950 dark:text-green-400"
+                          )}
+                          onClick={() => {
+                            setLiked(true);
+                            setTimeout(() => setLiked(null), 400);
+                          }}
+                        >
+                          <ThumbsUp className="size-4" />
+                        </Button>
+                      </MessageAction>
+
+                      <MessageAction tooltip="Not helpful">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
+                            liked === false && "bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400"
+                          )}
+                          onClick={() => {
+                            setLiked(false);
+                            setTimeout(() => setLiked(null), 400);
+                          }}
+                        >
+                          <ThumbsDown className="size-4" />
+                        </Button>
+                      </MessageAction>
+                    </MessageActions>
+                  </div>
+                </Message>
+              </div>
+            </TooltipProvider>
+          </div>
+          <div className="w-full min-w-0 max-w-2xl mt-4 shrink-0 flex flex-col gap-3 px-4 overflow-hidden mx-auto">
+            <div className="min-w-0 w-full overflow-hidden">
               <ChatInput
                 onSend={handleSend}
                 mode={mode}
@@ -140,10 +250,8 @@ export function ConversationPanel({ className }: { className?: string }) {
                 onInputChange={setExploreInput}
                 value={exploreInput}
                 showModeSelector={true}
-                selectedCountry={null}
+                selectedCountry={selectedCountry}
                 onCountrySelect={handleCountrySelect}
-                onChangeDestination={handleChangeDestination}
-                onConfirmDestination={handleConfirmDestination}
                 isConfirmed={true}
               />
             </div>
@@ -151,23 +259,26 @@ export function ConversationPanel({ className }: { className?: string }) {
         </div>
         {globePanelExpanded && (
           <>
+            <div className="w-6 shrink-0" aria-hidden />
             <div
               role="separator"
               aria-orientation="vertical"
-              aria-label="Resize globe panel"
-              onMouseDown={() => setIsResizing(true)}
+              aria-label="Resize globe panel - drag to expand or collapse"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setIsResizing(true);
+              }}
               className={cn(
-                "w-2 shrink-0 flex items-center justify-center bg-border hover:bg-muted-foreground/20 cursor-col-resize transition-colors group",
-                isResizing && "bg-primary/30"
+                "relative w-4 shrink-0 self-stretch z-10 border-l border-border bg-transparent hover:bg-muted-foreground/15 cursor-col-resize transition-all duration-200 ease-out",
+                isResizing && "bg-muted-foreground/20"
               )}
-            >
-              <div className="flex flex-col gap-0.5">
-                <GripVertical className="size-3.5 text-muted-foreground/60 group-hover:text-muted-foreground" />
-              </div>
-            </div>
+            />
             <div
               style={{ width: `${globePanelWidthPercent}%`, minWidth: GLOBE_PANEL_MIN_PX }}
-              className="min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 transition-[width] duration-150 ease-out animate-in slide-in-from-right-4 fade-in-0"
+              className={cn(
+                "shrink-0 self-stretch -my-4 -mr-4 min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 animate-in slide-in-from-right-4 fade-in-0",
+                !isResizing && "transition-[width] duration-200 ease-out"
+              )}
             >
               <div className="w-full h-full flex-1 min-h-0">
                 <ExploreGlobe
@@ -178,9 +289,6 @@ export function ConversationPanel({ className }: { className?: string }) {
                   isConfirmed={isConfirmed}
                 />
               </div>
-              <div className="flex items-center justify-center mt-2 mb-2 font-departure-mono text-foreground text-[0.875rem] shrink-0">
-                <span>Drag to rotate · Click to select</span>
-              </div>
             </div>
           </>
         )}
@@ -190,10 +298,10 @@ export function ConversationPanel({ className }: { className?: string }) {
 
   if (hasMessages) {
     return (
-      <div className={cn("flex flex-col h-full bg-background p-4", className)}>
+      <div className={cn("flex flex-col h-full bg-background p-4 min-w-0 overflow-hidden", className)}>
         <div className="flex-1 min-h-0" />
-        <div className="flex items-center gap-2 w-full max-w-[calc(48rem+8rem)] mx-auto">
-          <div className="flex-1 min-w-0 max-w-3xl">
+        <div className="flex items-center gap-2 w-full min-w-0 max-w-full">
+          <div className="flex-1 min-w-0 w-full">
             <ChatInput
               onSend={handleSend}
               mode={mode}
@@ -203,8 +311,6 @@ export function ConversationPanel({ className }: { className?: string }) {
               showModeSelector={!!selectedCountry}
               selectedCountry={selectedCountry}
               onCountrySelect={handleCountrySelect}
-              onChangeDestination={handleChangeDestination}
-              onConfirmDestination={handleConfirmDestination}
             />
           </div>
         </div>
@@ -220,17 +326,9 @@ export function ConversationPanel({ className }: { className?: string }) {
         className
       )}
     >
-      <button
-        type="button"
-        onClick={() => setGlobePanelExpanded((e) => !e)}
-        className="fixed top-4 right-4 z-[100] flex h-10 w-10 items-center justify-center text-foreground hover:opacity-80 focus:outline-none focus:ring-0 active:bg-transparent [-webkit-tap-highlight-color:transparent]"
-        aria-label={globePanelExpanded ? "Hide globe" : "Show globe"}
-      >
-        <Earth className="h-5 w-5 shrink-0" />
-      </button>
-      <div className="flex min-h-0 flex-col justify-start">
-        <div className="w-full max-w-[calc(48rem+8rem)] mx-auto mb-4 shrink-0 flex items-center gap-2">
-          <div className="flex-1 min-w-0 max-w-3xl">
+      <div className="flex min-h-0 flex-col justify-start min-w-0 overflow-visible">
+        <div className="w-full min-w-0 max-w-full mb-4 shrink-0 flex items-center gap-2 overflow-visible">
+          <div className="flex-1 min-w-0 w-full">
             <ChatInput
               onSend={handleSend}
               mode={mode}
@@ -240,8 +338,6 @@ export function ConversationPanel({ className }: { className?: string }) {
               showModeSelector={true}
               selectedCountry={selectedCountry}
               onCountrySelect={handleCountrySelect}
-              onChangeDestination={handleChangeDestination}
-              onConfirmDestination={handleConfirmDestination}
             />
           </div>
         </div>

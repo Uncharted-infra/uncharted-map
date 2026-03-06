@@ -1,12 +1,27 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import { AppSidebar } from "./app-sidebar";
 import { ConversationPanel } from "./conversation-panel";
 import { SidebarProvider, useSidebar } from "@/contexts/sidebar-context";
+import { TripsProvider } from "@/contexts/trips-context";
+import { NewTripProvider } from "@/contexts/new-trip-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-function MapLayoutContent() {
+const AppSidebar = dynamic(
+  () => import("./app-sidebar").then((m) => ({ default: m.AppSidebar })),
+  {
+    ssr: false,
+    loading: () => (
+      <aside
+        className="fixed left-0 top-0 z-40 h-screen border-r bg-card hidden md:block w-[260px] shrink-0"
+        aria-hidden
+      />
+    ),
+  }
+);
+
+function MapLayoutContent({ children }: { children?: React.ReactNode }) {
   const { sidebarWidth } = useSidebar();
   const isMobile = useIsMobile();
 
@@ -21,16 +36,20 @@ function MapLayoutContent() {
         )}
         style={{ marginLeft: isMobile ? 0 : sidebarWidth }}
       >
-        <ConversationPanel className="flex-1 min-w-0" />
+        {children ?? <ConversationPanel className="flex-1 min-w-0" />}
       </main>
     </div>
   );
 }
 
-export function MapLayout() {
+export function MapLayout({ children }: { children?: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <MapLayoutContent />
+      <TripsProvider>
+        <NewTripProvider>
+          <MapLayoutContent>{children}</MapLayoutContent>
+        </NewTripProvider>
+      </TripsProvider>
     </SidebarProvider>
   );
 }

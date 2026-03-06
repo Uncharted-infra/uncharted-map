@@ -23,6 +23,14 @@ import {
   Plane,
   Activity,
   FileText,
+  MoreVertical,
+  Share2,
+  Users,
+  Pencil,
+  Pin,
+  Archive,
+  Trash2,
+  Settings,
 } from "lucide-react";
 import { useSidebar, SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import { PassportIcon } from "@/components/icons/passport-icon";
@@ -37,12 +45,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { SettingsModal } from "@/components/map/settings-modal";
+import { useTripsOptional } from "@/contexts/trips-context";
+import { useNewTrip } from "@/contexts/new-trip-context";
+import type { Trip } from "@/lib/trips-state";
 import { cn } from "@/lib/utils";
 
-// Placeholder trips - will be replaced with real data when trips are created
-const PLACEHOLDER_TRIPS: { id: string; name: string }[] = [];
+const MODE_LABELS: Record<"explore" | "plan" | "book", string> = {
+  explore: "Explore",
+  plan: "Plan",
+  book: "Book",
+};
 
 // Plan tiers: adventurer | nomad | wanderlust | enterprise
 const CURRENT_PLAN = "enterprise";
@@ -60,21 +82,176 @@ const documentItems = [
 ] as const;
 
 function ThemeRadioGroup({ theme, setTheme }: { theme: string | undefined; setTheme: (v: string) => void }) {
+  const radioItemClass = "gap-2 !pl-2 [&>span]:left-auto [&>span]:right-2";
   return (
     <DropdownMenuRadioGroup value={theme ?? "system"} onValueChange={setTheme}>
-      <DropdownMenuRadioItem value="light" className="gap-2">
+      <DropdownMenuRadioItem value="light" className={radioItemClass}>
         <Sun className="h-4 w-4 shrink-0" />
         Light
       </DropdownMenuRadioItem>
-      <DropdownMenuRadioItem value="dark" className="gap-2">
+      <DropdownMenuRadioItem value="dark" className={radioItemClass}>
         <Moon className="h-4 w-4 shrink-0" />
         Dark
       </DropdownMenuRadioItem>
-      <DropdownMenuRadioItem value="system" className="gap-2">
+      <DropdownMenuRadioItem value="system" className={radioItemClass}>
         <Monitor className="h-4 w-4 shrink-0" />
         System
       </DropdownMenuRadioItem>
     </DropdownMenuRadioGroup>
+  );
+}
+
+function TripItem({
+  trip,
+  onLinkClick,
+  updateTrip,
+  removeTrip,
+}: {
+  trip: Trip;
+  onLinkClick?: () => void;
+  updateTrip: (id: string, updates: Partial<Pick<Trip, "name" | "pinned" | "archived">>) => Trip | null;
+  removeTrip: (id: string) => boolean;
+}) {
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameValue, setRenameValue] = useState(trip.name);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+
+  const showFeedback = (msg: string) => {
+    setActionFeedback(msg);
+    setTimeout(() => setActionFeedback(null), 2000);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const url = typeof window !== "undefined" ? `${window.location.origin}/trip/${trip.id}` : "";
+    navigator.clipboard.writeText(url).then(() => showFeedback("Link copied!"));
+  };
+
+  const handleGroupTrip = (e: React.MouseEvent) => {
+    e.preventDefault();
+    showFeedback("Group trip coming soon");
+  };
+
+  const handleRename = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setRenameValue(trip.name);
+    setRenameOpen(true);
+  };
+
+  const handleRenameSubmit = () => {
+    const trimmed = renameValue.trim();
+    if (trimmed && trimmed !== trip.name) {
+      updateTrip(trip.id, { name: trimmed });
+      showFeedback("Renamed");
+    }
+    setRenameOpen(false);
+  };
+
+  const handlePin = (e: React.MouseEvent) => {
+    e.preventDefault();
+    updateTrip(trip.id, { pinned: !trip.pinned });
+    showFeedback(trip.pinned ? "Unpinned" : "Pinned");
+  };
+
+  const handleArchive = (e: React.MouseEvent) => {
+    e.preventDefault();
+    updateTrip(trip.id, { archived: !trip.archived });
+    showFeedback(trip.archived ? "Restored" : "Archived");
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    removeTrip(trip.id);
+    showFeedback("Deleted");
+  };
+
+  return (
+    <>
+      <div className="group flex items-center gap-1 min-w-0 py-1.5">
+        <Link
+          href={`/trip/${trip.id}`}
+          onClick={onLinkClick}
+          className="flex-1 min-w-0 flex flex-col gap-0.5 font-departure-mono text-sm hover:text-foreground text-muted-foreground"
+        >
+          <span className="font-medium text-foreground truncate flex items-center gap-1.5">
+            {trip.pinned && <Pin className="h-3 shrink-0 opacity-60" />}
+            {trip.name}
+          </span>
+          <span className="text-xs text-muted-foreground truncate">
+            {MODE_LABELS[trip.mode]} · {trip.date}
+          </span>
+        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              onClick={(e) => e.preventDefault()}
+              className="shrink-0 p-1 rounded hover:bg-accent/50 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity focus:outline-none focus:ring-0"
+              aria-label="Trip actions"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="font-departure-mono w-48">
+            <DropdownMenuItem onClick={handleShare}>
+              <Share2 className="h-4 w-4 shrink-0" />
+              Share
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGroupTrip}>
+              <Users className="h-4 w-4 shrink-0" />
+              Group trip
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleRename}>
+              <Pencil className="h-4 w-4 shrink-0" />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePin}>
+              <Pin className="h-4 w-4 shrink-0" />
+              {trip.pinned ? "Unpin chat" : "Pin chat"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleArchive}>
+              <Archive className="h-4 w-4 shrink-0" />
+              {trip.archived ? "Unarchive" : "Archive"}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+              <Trash2 className="h-4 w-4 shrink-0" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      {actionFeedback && (
+        <span className="absolute left-0 right-0 top-full text-xs text-muted-foreground text-center py-0.5 animate-in fade-in-0">
+          {actionFeedback}
+        </span>
+      )}
+      <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
+        <DialogContent className="font-departure-mono gap-4">
+          <DialogHeader>
+            <DialogTitle>Rename trip</DialogTitle>
+          </DialogHeader>
+          <Input
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleRenameSubmit()}
+            placeholder="Trip name"
+          />
+          <DialogFooter className="gap-2">
+            <button
+              type="button"
+              onClick={() => setRenameOpen(false)}
+              className="px-4 py-2 text-sm rounded-md hover:bg-accent"
+            >
+              Cancel
+            </button>
+            <PrimaryGrowButton size="sm" onClick={handleRenameSubmit}>
+              Save
+            </PrimaryGrowButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -149,7 +326,12 @@ function SidebarContent({
 }: { onLinkClick?: () => void; forceExpanded?: boolean; onOpenSettings?: () => void }) {
   const pathname = usePathname();
   const { collapsed, toggleCollapsed, sidebarWidth } = useSidebar();
+  const { resetNewTrip } = useNewTrip() ?? {};
   const { theme, setTheme } = useTheme();
+  const tripsContext = useTripsOptional();
+  const allTrips = tripsContext?.trips ?? [];
+  const trips = allTrips.filter((t) => !t.archived).sort((a, b) => (a.pinned ? 0 : 1) - (b.pinned ? 0 : 1));
+  const archivedTrips = allTrips.filter((t) => t.archived);
   const isCollapsed = forceExpanded ? false : collapsed;
   const profileMenuWidth = forceExpanded ? SIDEBAR_WIDTH_EXPANDED : sidebarWidth;
   const [tripsOpen, setTripsOpen] = useState(false);
@@ -171,7 +353,14 @@ function SidebarContent({
             </PrimaryGrowButton>
           ) : (
             <>
-              <Link href="/" onClick={onLinkClick} className="flex items-center min-w-0 shrink-0 font-departure-mono text-base font-semibold">
+              <Link
+                href="/"
+                onClick={() => {
+                  resetNewTrip?.();
+                  onLinkClick?.();
+                }}
+                className="flex items-center min-w-0 shrink-0 font-departure-mono text-base font-semibold"
+              >
                 Uncharted
               </Link>
               {!forceExpanded && (
@@ -196,7 +385,14 @@ function SidebarContent({
             )}
             asChild
           >
-            <Link href="/" onClick={onLinkClick} title={isCollapsed ? "New Trip" : undefined}>
+            <Link
+              href="/"
+              onClick={() => {
+                resetNewTrip?.();
+                onLinkClick?.();
+              }}
+              title={isCollapsed ? "New Trip" : undefined}
+            >
               <MapPinPlus className="h-4 w-4 shrink-0" />
               {!isCollapsed && "New Trip"}
             </Link>
@@ -229,6 +425,19 @@ function SidebarContent({
             </Link>
           </PrimaryGrowButton>
 
+          <PrimaryGrowButton
+            className={cn(
+              "font-departure-mono text-sm",
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
+            )}
+            asChild
+          >
+            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
+              <PassportIcon className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Passport"}
+            </Link>
+          </PrimaryGrowButton>
+
           <CollapsibleNavSection
             icon={Map}
             label="Trips"
@@ -240,14 +449,36 @@ function SidebarContent({
             onCollapsedClick={() => { toggleCollapsed(); setTripsOpen(true); }}
             onLinkClick={onLinkClick}
           >
-            {PLACEHOLDER_TRIPS.length === 0 ? (
+            {trips.length === 0 && archivedTrips.length === 0 ? (
               <span className="font-departure-mono text-xs text-muted-foreground py-1">No trips yet</span>
             ) : (
-              PLACEHOLDER_TRIPS.map((trip) => (
-                <Link key={trip.id} href={`/trip/${trip.id}`} onClick={onLinkClick} className="font-departure-mono text-sm hover:text-foreground text-muted-foreground py-1">
-                  {trip.name}
-                </Link>
-              ))
+              <>
+                {trips.map((trip) => (
+                  <div key={trip.id} className="relative">
+                    <TripItem
+                      trip={trip}
+                      onLinkClick={onLinkClick}
+                      updateTrip={tripsContext?.updateTrip ?? (() => null)}
+                      removeTrip={tripsContext?.removeTrip ?? (() => false)}
+                    />
+                  </div>
+                ))}
+                {archivedTrips.length > 0 && tripsContext && (
+                  <>
+                    <span className="font-departure-mono text-xs text-muted-foreground py-1 mt-2">Archived</span>
+                    {archivedTrips.map((trip) => (
+                      <div key={trip.id} className="relative">
+                        <TripItem
+                          trip={trip}
+                          onLinkClick={onLinkClick}
+                          updateTrip={tripsContext.updateTrip}
+                          removeTrip={tripsContext.removeTrip}
+                        />
+                      </div>
+                    ))}
+                  </>
+                )}
+              </>
             )}
           </CollapsibleNavSection>
 
@@ -309,8 +540,8 @@ function SidebarContent({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" side="top" className="font-departure-mono" style={{ width: profileMenuWidth }}>
               <DropdownMenuItem onClick={onOpenSettings}>
-                <PassportIcon />
-                Passport
+                <Settings className="h-4 w-4 shrink-0" />
+                Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <ThemeRadioGroup theme={theme} setTheme={setTheme} />
@@ -342,15 +573,22 @@ function SidebarContent({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="top" className="font-departure-mono -translate-x-[0px]" style={{ width: profileMenuWidth }}>
                   <DropdownMenuItem onClick={onOpenSettings}>
-                    <PassportIcon />
-                    Passport
+                    <Settings className="h-4 w-4 shrink-0" />
+                    Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <ThemeRadioGroup theme={theme} setTheme={setTheme} />
                 </DropdownMenuContent>
               </DropdownMenu>
             <SecondaryGrowButton size="sm" className="w-full font-departure-mono justify-start px-4" asChild>
-              <Link href="/" onClick={onLinkClick} className="flex items-center">
+              <Link
+          href="/"
+          onClick={() => {
+            resetNewTrip?.();
+            onLinkClick?.();
+          }}
+          className="flex items-center"
+        >
                 Upgrade
               </Link>
             </SecondaryGrowButton>
@@ -365,6 +603,7 @@ export function AppSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { sidebarWidth } = useSidebar();
+  const { resetNewTrip } = useNewTrip() ?? {};
 
   return (
     <>
@@ -376,7 +615,7 @@ export function AppSidebar() {
       </aside>
 
       <div className="fixed left-0 top-0 z-40 flex md:hidden items-center gap-2 p-2">
-        <Link href="/" className="shrink-0">
+        <Link href="/" onClick={() => resetNewTrip?.()} className="shrink-0">
           <Image
             src="/img/logo/logo.png"
             alt="Map"

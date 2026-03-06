@@ -10,8 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { User, Plane, Coins, Plug, Bell, ChevronDown, Check, Save, Trash2 } from "lucide-react";
-import { PassportIcon } from "@/components/icons/passport-icon";
+import { User, Plane, Coins, Plug, Bell, ChevronDown, Check, Save, Trash2, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COUNTRIES, COUNTRY_PHONE_FORMATS, DEFAULT_PHONE_SEGMENTS } from "@/data/countries";
 import { TRAVEL_FIELDS, INTEGRATIONS, NOTIFICATION_ITEMS } from "@/data/settings";
@@ -98,12 +97,12 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
         className="max-w-6xl w-[95vw] h-[90vh] p-0 gap-0 overflow-hidden flex flex-col [&>button]:right-4 [&>button]:top-4 [&>button]:z-10"
         overlayClassName="left-1/2 top-1/2 right-auto bottom-auto w-[95vw] max-w-6xl h-[90vh] -translate-x-1/2 -translate-y-1/2"
       >
-        <DialogTitle className="sr-only">Passport</DialogTitle>
+        <DialogTitle className="sr-only">Settings</DialogTitle>
         <div className="relative flex-1 min-h-0 flex overflow-hidden">
           <aside className="absolute left-0 top-0 bottom-0 z-10 w-[240px] flex flex-col border-r-2 border-border bg-muted/40">
             <div className="shrink-0 p-3 border-b-2 border-border flex items-center">
-              <h2 className="font-departure-mono text-lg font-semibold">Passport</h2>
-              <PassportIcon className="h-5 w-5 shrink-0 ml-[100px]" />
+              <h2 className="font-departure-mono text-lg font-semibold">Settings</h2>
+              <Settings className="h-5 w-5 shrink-0 ml-[100px]" />
             </div>
             <nav className="flex-1 overflow-y-auto py-2 min-h-0">
               {TABS.map((tab) => {
