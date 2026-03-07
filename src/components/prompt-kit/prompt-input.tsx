@@ -10,8 +10,11 @@ interface PromptInputContextValue {
   isLoading: boolean
   onSubmit: () => void
   maxHeight: number | string
+  textareaMaxHeight: number
   onTextareaResize?: (height: number) => void
 }
+
+const TEXTAREA_GROW_UNBOUNDED = 9999
 
 const PromptInputContext = React.createContext<PromptInputContextValue | null>(null)
 
@@ -44,6 +47,9 @@ function PromptInput({
   children,
   className,
 }: PromptInputProps) {
+  const maxHeightPx =
+    typeof maxHeight === "number" ? maxHeight : parseInt(String(maxHeight).replace(/\D/g, ""), 10) || 240
+
   return (
     <PromptInputContext.Provider
       value={{
@@ -52,17 +58,23 @@ function PromptInput({
         isLoading,
         onSubmit,
         maxHeight,
+        textareaMaxHeight: TEXTAREA_GROW_UNBOUNDED,
         onTextareaResize,
       }}
     >
       <TooltipProvider delayDuration={0}>
         <div
           className={cn(
-            "flex flex-col min-w-0 w-full max-w-full overflow-hidden rounded-full border border-border bg-card px-4 py-2.5 shadow-sm",
+            "min-w-0 w-full max-w-full overflow-hidden rounded-xl border border-input bg-background shadow-xs",
             className
           )}
         >
-          {children}
+          <div
+            className="scrollbar-prompt flex min-h-[60px] min-w-0 flex-col gap-2 overflow-y-auto overflow-x-hidden px-4 py-2.5"
+            style={{ maxHeight: maxHeightPx }}
+          >
+            {children}
+          </div>
         </div>
       </TooltipProvider>
     </PromptInputContext.Provider>
@@ -91,19 +103,17 @@ const PromptInputTextarea = React.forwardRef<
     },
     ref
   ) => {
-    const { value, onValueChange, onSubmit, maxHeight, isLoading, onTextareaResize } = usePromptInput()
+    const { value, onValueChange, onSubmit, textareaMaxHeight, isLoading, onTextareaResize } = usePromptInput()
     const textareaRef = React.useRef<HTMLTextAreaElement | null>(null)
-    const maxHeightPx =
-      typeof maxHeight === "number" ? maxHeight : parseInt(String(maxHeight).replace(/\D/g, ""), 10) || 120
 
     const adjustHeight = React.useCallback(() => {
       const el = textareaRef.current
       if (!el || disableAutosize) return
       el.style.height = "24px"
-      const newHeight = Math.min(el.scrollHeight, maxHeightPx)
+      const newHeight = Math.min(el.scrollHeight, textareaMaxHeight)
       el.style.height = `${newHeight}px`
       onTextareaResize?.(newHeight)
-    }, [disableAutosize, maxHeightPx, onTextareaResize])
+    }, [disableAutosize, textareaMaxHeight, onTextareaResize])
 
     React.useEffect(() => {
       adjustHeight()
@@ -137,11 +147,11 @@ const PromptInputTextarea = React.forwardRef<
         placeholder={placeholder}
         onKeyDown={handleKeyDown}
         className={cn(
-          "font-wenkai-mono-bold placeholder:font-wenkai-mono-bold min-h-[24px] min-w-0 flex-1 resize-none overflow-y-auto border-0 bg-transparent px-2 py-1 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "font-wenkai-mono-bold placeholder:font-wenkai-mono-bold min-h-[24px] min-w-0 flex-1 resize-none overflow-x-hidden border-0 bg-transparent px-2 py-1 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm break-all",
           className
         )}
         style={{
-          maxHeight: `${maxHeightPx}px`,
+          maxHeight: `${textareaMaxHeight}px`,
         }}
         rows={1}
         {...props}

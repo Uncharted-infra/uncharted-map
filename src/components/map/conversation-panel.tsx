@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Earth } from "lucide-react";
+import { SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import type { ChatMode } from "./chat-input";
+
+const GLOBE_PANEL_WIDTH = Math.round(SIDEBAR_WIDTH_EXPANDED * 2.3);
 
 const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
   ssr: false,
@@ -92,42 +95,7 @@ export function ConversationPanel({ className }: { className?: string }) {
     });
   };
 
-  const GLOBE_PANEL_MIN_PX = 280;
-  const GLOBE_PANEL_MAX_PERCENT = 81;
-  const GLOBE_PANEL_DEFAULT_PERCENT = 56;
-  const [globePanelWidthPercent, setGlobePanelWidthPercent] = useState(GLOBE_PANEL_DEFAULT_PERCENT);
-  const [isResizing, setIsResizing] = useState(false);
   const [globePanelExpanded, setGlobePanelExpanded] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleResizeMove = useCallback(
-    (e: MouseEvent) => {
-      if (!containerRef.current || !isResizing) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const containerWidth = rect.width;
-      const mouseX = e.clientX - rect.left;
-      const rightPanelWidthPx = containerWidth - mouseX;
-      const percent = (rightPanelWidthPx / containerWidth) * 100;
-      const minPercent = (GLOBE_PANEL_MIN_PX / containerWidth) * 100;
-      const clamped = Math.min(GLOBE_PANEL_MAX_PERCENT, Math.max(minPercent, percent));
-      setGlobePanelWidthPercent(clamped);
-    },
-    [isResizing]
-  );
-
-  const handleResizeEnd = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isResizing) return;
-    window.addEventListener("mousemove", handleResizeMove);
-    window.addEventListener("mouseup", handleResizeEnd);
-    return () => {
-      window.removeEventListener("mousemove", handleResizeMove);
-      window.removeEventListener("mouseup", handleResizeEnd);
-    };
-  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
   const showGlobe = !hasMessages || isConfirmed;
   const highlightedCountry = useMemo(
@@ -152,10 +120,8 @@ export function ConversationPanel({ className }: { className?: string }) {
   if (isConfirmed) {
     return (
       <div
-        ref={containerRef}
         className={cn(
-          "relative flex flex-row h-full bg-background p-4 overflow-hidden select-none",
-          isResizing && "cursor-col-resize",
+          "relative flex flex-row h-full bg-background overflow-hidden select-none",
           className
         )}
       >
@@ -167,7 +133,7 @@ export function ConversationPanel({ className }: { className?: string }) {
         >
           <Earth className="h-5 w-5 shrink-0" />
         </button>
-        <div className="flex-1 min-w-0 flex flex-col min-h-0 transition-all duration-500 ease-smooth animate-in slide-in-from-top-4 fade-in-0 overflow-hidden">
+        <div className="flex-1 min-w-0 flex flex-col min-h-0 pt-4 pb-4 pl-4 pr-0 transition-all duration-500 ease-smooth animate-in slide-in-from-top-4 fade-in-0 overflow-hidden">
           <div className="flex-1 min-h-0 overflow-auto min-w-0 flex flex-col items-center">
             <TooltipProvider delayDuration={0}>
               <div className="flex flex-col gap-8 w-full min-w-0 max-w-2xl px-4 py-6 mx-auto">
@@ -241,8 +207,8 @@ export function ConversationPanel({ className }: { className?: string }) {
               </div>
             </TooltipProvider>
           </div>
-          <div className="w-full min-w-0 max-w-2xl mt-4 shrink-0 flex flex-col gap-3 px-4 overflow-hidden mx-auto">
-            <div className="min-w-0 w-full overflow-hidden">
+          <div className="w-full min-w-0 max-w-2xl mt-4 shrink-0 flex flex-col gap-3 px-4 overflow-visible mx-auto">
+            <div className="min-w-0 w-full overflow-visible">
               <ChatInput
                 onSend={handleSend}
                 mode={mode}
@@ -263,22 +229,11 @@ export function ConversationPanel({ className }: { className?: string }) {
             <div
               role="separator"
               aria-orientation="vertical"
-              aria-label="Resize globe panel - drag to expand or collapse"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                setIsResizing(true);
-              }}
-              className={cn(
-                "relative w-4 shrink-0 self-stretch z-10 border-l border-border bg-transparent hover:bg-muted-foreground/15 cursor-col-resize transition-all duration-200 ease-out",
-                isResizing && "bg-muted-foreground/20"
-              )}
+              className="w-px shrink-0 self-stretch border-l border-border bg-transparent"
             />
             <div
-              style={{ width: `${globePanelWidthPercent}%`, minWidth: GLOBE_PANEL_MIN_PX }}
-              className={cn(
-                "shrink-0 self-stretch -my-4 -mr-4 min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 animate-in slide-in-from-right-4 fade-in-0",
-                !isResizing && "transition-[width] duration-200 ease-out"
-              )}
+              style={{ width: GLOBE_PANEL_WIDTH }}
+              className="shrink-0 self-stretch min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 pr-4 animate-in slide-in-from-right-4 fade-in-0"
             >
               <div className="w-full h-full flex-1 min-h-0">
                 <ExploreGlobe
@@ -300,8 +255,8 @@ export function ConversationPanel({ className }: { className?: string }) {
     return (
       <div className={cn("flex flex-col h-full bg-background p-4 min-w-0 overflow-hidden", className)}>
         <div className="flex-1 min-h-0" />
-        <div className="flex items-center gap-2 w-full min-w-0 max-w-full">
-          <div className="flex-1 min-w-0 w-full">
+        <div className="flex items-center gap-2 w-full min-w-0 max-w-full overflow-visible">
+          <div className="flex-1 min-w-0 w-full overflow-visible">
             <ChatInput
               onSend={handleSend}
               mode={mode}
@@ -328,7 +283,7 @@ export function ConversationPanel({ className }: { className?: string }) {
     >
       <div className="flex min-h-0 flex-col justify-start min-w-0 overflow-visible">
         <div className="w-full min-w-0 max-w-full mb-4 shrink-0 flex items-center gap-2 overflow-visible">
-          <div className="flex-1 min-w-0 w-full">
+          <div className="flex-1 min-w-0 w-full overflow-visible">
             <ChatInput
               onSend={handleSend}
               mode={mode}

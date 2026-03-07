@@ -103,3 +103,33 @@
     @apply bg-background text-foreground font-wenkai-mono-bold antialiased;
   }
 }
+
+/* Scrollbar for prompt/chat input - visible, fits in container */
+@layer utilities {
+  .scrollbar-prompt {
+    scrollbar-gutter: stable;
+    scrollbar-width: 12px;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.4) hsl(var(--muted) / 0.3);
+  }
+  .scrollbar-prompt::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  .scrollbar-prompt::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.3);
+    border-radius: 6px;
+    margin: 4px 0;
+  }
+  .scrollbar-prompt::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .scrollbar-prompt::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.55);
+  }
+  .scrollbar-prompt::-webkit-scrollbar-thumb:active {
+    background: hsl(var(--muted-foreground) / 0.7);
+  }
+}

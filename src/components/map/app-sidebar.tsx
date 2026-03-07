@@ -381,6 +381,20 @@ function SidebarContent({
           <PrimaryGrowButton
             className={cn(
               "font-departure-mono text-sm",
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
+              pathname === "/search" && "bg-transparent"
+            )}
+            asChild
+          >
+            <Link href="/search" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
+              <Search className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Search"}
+            </Link>
+          </PrimaryGrowButton>
+
+          <PrimaryGrowButton
+            className={cn(
+              "font-departure-mono text-sm",
               isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
             )}
             asChild
@@ -401,14 +415,13 @@ function SidebarContent({
           <PrimaryGrowButton
             className={cn(
               "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
-              pathname === "/search" && "bg-transparent"
+              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
             )}
             asChild
           >
-            <Link href="/search" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
-              <Search className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Search"}
+            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
+              <PassportIcon className="h-4 w-4 shrink-0" />
+              {!isCollapsed && "Passport"}
             </Link>
           </PrimaryGrowButton>
 
@@ -422,19 +435,6 @@ function SidebarContent({
             <Link href="/compass" onClick={onLinkClick} title={isCollapsed ? "Compass" : undefined}>
               <Compass className="h-4 w-4 shrink-0" />
               {!isCollapsed && "Compass"}
-            </Link>
-          </PrimaryGrowButton>
-
-          <PrimaryGrowButton
-            className={cn(
-              "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
-            )}
-            asChild
-          >
-            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
-              <PassportIcon className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Passport"}
             </Link>
           </PrimaryGrowButton>
 
