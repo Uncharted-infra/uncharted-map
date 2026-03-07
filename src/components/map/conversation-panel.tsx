@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Earth } from "lucide-react";
 import { SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import type { ChatMode } from "./chat-input";
 
 const GLOBE_PANEL_WIDTH = Math.round(SIDEBAR_WIDTH_EXPANDED * 2.3);
+const GLOBE_SECTION_WIDTH = 24 + 1 + GLOBE_PANEL_WIDTH; // spacer + separator + panel
+const GLOBE_ANIMATION_MS = 450;
 
 const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
   ssr: false,
@@ -96,6 +98,38 @@ export function ConversationPanel({ className }: { className?: string }) {
   };
 
   const [globePanelExpanded, setGlobePanelExpanded] = useState(true);
+  const [isGlobeExiting, setIsGlobeExiting] = useState(false);
+  const [globeExpandReady, setGlobeExpandReady] = useState(true);
+  const prevGlobeExpandedRef = useRef(true);
+
+  useEffect(() => {
+    if (globePanelExpanded && !isGlobeExiting) {
+      const isOpening = prevGlobeExpandedRef.current === false;
+      prevGlobeExpandedRef.current = true;
+      if (isOpening) {
+        setGlobeExpandReady(false);
+        const id = requestAnimationFrame(() => setGlobeExpandReady(true));
+        return () => cancelAnimationFrame(id);
+      }
+    } else {
+      prevGlobeExpandedRef.current = globePanelExpanded;
+    }
+  }, [globePanelExpanded, isGlobeExiting]);
+
+  const handleGlobeToggle = () => {
+    if (globePanelExpanded && !isGlobeExiting) {
+      setIsGlobeExiting(true);
+    } else if (!globePanelExpanded) {
+      setGlobePanelExpanded(true);
+    }
+  };
+
+  const handleGlobeExitEnd = () => {
+    if (isGlobeExiting) {
+      setIsGlobeExiting(false);
+      setGlobePanelExpanded(false);
+    }
+  };
 
   const showGlobe = !hasMessages || isConfirmed;
   const highlightedCountry = useMemo(
@@ -127,13 +161,13 @@ export function ConversationPanel({ className }: { className?: string }) {
       >
         <button
           type="button"
-          onClick={() => setGlobePanelExpanded((e) => !e)}
+          onClick={handleGlobeToggle}
           className="fixed top-4 right-4 z-[100] flex h-10 w-10 items-center justify-center text-foreground hover:opacity-80 focus:outline-none focus:ring-0 active:bg-transparent [-webkit-tap-highlight-color:transparent]"
           aria-label={globePanelExpanded ? "Hide globe" : "Show globe"}
         >
           <Earth className="h-5 w-5 shrink-0" />
         </button>
-        <div className="flex-1 min-w-0 flex flex-col min-h-0 pt-4 pb-4 pl-4 pr-0 transition-all duration-500 ease-smooth animate-in slide-in-from-top-4 fade-in-0 overflow-hidden">
+        <div className="flex-1 min-w-0 flex flex-col min-h-0 pt-4 pb-4 pl-4 pr-0 overflow-hidden">
           <div className="flex-1 min-h-0 overflow-auto min-w-0 flex flex-col items-center">
             <TooltipProvider delayDuration={0}>
               <div className="flex flex-col gap-8 w-full min-w-0 max-w-2xl px-4 py-6 mx-auto">
@@ -223,29 +257,46 @@ export function ConversationPanel({ className }: { className?: string }) {
             </div>
           </div>
         </div>
-        {globePanelExpanded && (
-          <>
-            <div className="w-6 shrink-0" aria-hidden />
+        {(globePanelExpanded || isGlobeExiting) && (
+          <div
+            className="shrink-0 overflow-hidden self-stretch min-h-0"
+            style={{
+              width: isGlobeExiting ? 0 : globeExpandReady ? GLOBE_SECTION_WIDTH : 0,
+              transition: `width ${GLOBE_ANIMATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+            }}
+          >
             <div
-              role="separator"
-              aria-orientation="vertical"
-              className="w-px shrink-0 self-stretch border-l border-border bg-transparent"
-            />
-            <div
-              style={{ width: GLOBE_PANEL_WIDTH }}
-              className="shrink-0 self-stretch min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 pr-4 animate-in slide-in-from-right-4 fade-in-0"
+              className={cn(
+                "flex flex-row self-stretch min-h-0 h-full",
+                isGlobeExiting ? "animate-globe-slide-out" : "animate-globe-slide-in"
+              )}
+              onAnimationEnd={(e) => {
+                if (e.target === e.currentTarget && isGlobeExiting) handleGlobeExitEnd();
+              }}
+              style={{ width: GLOBE_SECTION_WIDTH, minWidth: GLOBE_SECTION_WIDTH }}
             >
-              <div className="w-full h-full flex-1 min-h-0">
-                <ExploreGlobe
-                  className="w-full h-full"
-                  highlightedCountry={highlightedCountry}
-                  centerOnCountry={centerOnCountry}
-                  onCountrySelect={isConfirmed ? undefined : handleCountrySelect}
-                  isConfirmed={isConfirmed}
-                />
+              <div className="w-6 shrink-0" aria-hidden />
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                className="w-px shrink-0 self-stretch border-l border-border bg-transparent"
+              />
+              <div
+                style={{ width: GLOBE_PANEL_WIDTH }}
+                className="shrink-0 self-stretch min-h-0 flex flex-col items-center justify-center overflow-hidden pl-4 pr-4"
+              >
+                <div className="w-full h-full flex-1 min-h-0">
+                  <ExploreGlobe
+                    className="w-full h-full"
+                    highlightedCountry={highlightedCountry}
+                    centerOnCountry={centerOnCountry}
+                    onCountrySelect={isConfirmed ? undefined : handleCountrySelect}
+                    isConfirmed={isConfirmed}
+                  />
+                </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     );

@@ -50,6 +50,26 @@ const config: Config = {
   					transform: 'translateX(0)'
   				}
   			},
+  			'globe-slide-in': {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateX(100%)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			'globe-slide-out': {
+  				'0%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				},
+  				'100%': {
+  					opacity: '0',
+  					transform: 'translateX(100%)'
+  				}
+  			},
   			'icon-mode-change': {
   				'0%': {
   					opacity: '0',
@@ -64,6 +84,8 @@ const config: Config = {
   		animation: {
   			'fade-slide-up': 'fade-slide-up 0.3s ease-out',
   			'slide-in-right': 'slide-in-right 0.3s ease-out',
+  			'globe-slide-in': 'globe-slide-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+  			'globe-slide-out': 'globe-slide-out 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards',
   			'icon-mode-change': 'icon-mode-change 0.25s ease-out'
   		},
   		transitionTimingFunction: {
