@@ -13,6 +13,7 @@ Guidelines for AI agents working in this codebase. Follow these rules to ensure 
 ---
 
 ## Workflow Orchestration
+
 ### 1. Plan Node Default
 
 - Enter plan mode for **any** non-trivial task (3+ steps or architectural decisions).
