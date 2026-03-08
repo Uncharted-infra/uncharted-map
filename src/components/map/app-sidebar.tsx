@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -70,6 +70,19 @@ const MODE_LABELS: Record<"explore" | "plan" | "book", string> = {
 
 // Plan tiers: adventurer | nomad | wanderlust | enterprise
 const CURRENT_PLAN = "enterprise";
+
+const NAV_ITEMS: Array<{
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  pathMatch?: string;
+  onReset?: boolean;
+}> = [
+  { href: "/search", icon: Search, label: "Search", pathMatch: "/search" },
+  { href: "/", icon: MapPinPlus, label: "New Trip", onReset: true },
+  { href: "/passport", icon: PassportIcon, label: "Passport" },
+  { href: "/compass", icon: Compass, label: "Compass" },
+];
 
 const luggageItems = [
   { icon: MapPin, label: "Places", href: "/luggage/places" },
@@ -380,65 +393,29 @@ function SidebarContent({
         </div>
 
         <nav className={cn("flex flex-col gap-1 pb-4", isCollapsed ? "pl-[3px] pr-2" : "pl-[7px] pr-3")}>
-          <PrimaryGrowButton
-            className={cn(
-              "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
-              pathname === "/search" && "bg-transparent"
-            )}
-            asChild
-          >
-            <Link href="/search" onClick={onLinkClick} title={isCollapsed ? "Search" : undefined}>
-              <Search className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Search"}
-            </Link>
-          </PrimaryGrowButton>
-
-          <PrimaryGrowButton
-            className={cn(
-              "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
-            )}
-            asChild
-          >
-            <Link
-              href="/"
-              onClick={() => {
-                resetNewTrip?.();
-                onLinkClick?.();
-              }}
-              title={isCollapsed ? "New Trip" : undefined}
+          {NAV_ITEMS.map(({ href, icon: Icon, label, pathMatch, onReset }) => (
+            <PrimaryGrowButton
+              key={href + label}
+              className={cn(
+                "font-departure-mono text-sm",
+                isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3",
+                pathMatch && pathname === pathMatch && "bg-transparent"
+              )}
+              asChild
             >
-              <MapPinPlus className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "New Trip"}
-            </Link>
-          </PrimaryGrowButton>
-
-          <PrimaryGrowButton
-            className={cn(
-              "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
-            )}
-            asChild
-          >
-            <Link href="/passport" onClick={onLinkClick} title={isCollapsed ? "Passport" : undefined}>
-              <PassportIcon className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Passport"}
-            </Link>
-          </PrimaryGrowButton>
-
-          <PrimaryGrowButton
-            className={cn(
-              "font-departure-mono text-sm",
-              isCollapsed ? "justify-center px-0 w-full" : "justify-start gap-3"
-            )}
-            asChild
-          >
-            <Link href="/compass" onClick={onLinkClick} title={isCollapsed ? "Compass" : undefined}>
-              <Compass className="h-4 w-4 shrink-0" />
-              {!isCollapsed && "Compass"}
-            </Link>
-          </PrimaryGrowButton>
+              <Link
+                href={href}
+                onClick={() => {
+                  if (onReset) resetNewTrip?.();
+                  onLinkClick?.();
+                }}
+                title={isCollapsed ? label : undefined}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {!isCollapsed && label}
+              </Link>
+            </PrimaryGrowButton>
+          ))}
 
           <CollapsibleNavSection
             icon={Map}

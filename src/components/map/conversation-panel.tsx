@@ -7,8 +7,10 @@ import { SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
 import type { ChatMode } from "./chat-input";
 
 const GLOBE_PANEL_WIDTH = Math.round(SIDEBAR_WIDTH_EXPANDED * 2.3);
-const GLOBE_SECTION_WIDTH = 24 + 1 + GLOBE_PANEL_WIDTH; // spacer + separator + panel
+const GLOBE_SECTION_WIDTH = 24 + 1 + GLOBE_PANEL_WIDTH;
 const GLOBE_ANIMATION_MS = 450;
+const AGENT_MESSAGE_TEXT =
+  "I can help with a variety of tasks: answering questions, providing information, assisting with coding, generating creative content. What would you like help with today?";
 
 const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
   ssr: false,
@@ -86,9 +88,6 @@ export function ConversationPanel({ className }: { className?: string }) {
     addTrip(value, mode);
     setIsConfirmed(true);
   };
-
-  const AGENT_MESSAGE_TEXT =
-    "I can help with a variety of tasks: answering questions, providing information, assisting with coding, generating creative content. What would you like help with today?";
 
   const handleCopyAgentMessage = () => {
     navigator.clipboard.writeText(AGENT_MESSAGE_TEXT).then(() => {

@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils"
 
 export type ChatMode = "explore" | "plan" | "book"
 
-const MODE_LABELS: Record<ChatMode, string> = {
-  explore: "Explore",
-  plan: "Plan",
-  book: "Book",
+const MODE_CONFIG: Record<ChatMode, { label: string; icon: typeof Compass; submitIcon: typeof Telescope }> = {
+  explore: { label: "Explore", icon: Compass, submitIcon: Telescope },
+  plan: { label: "Plan", icon: Map, submitIcon: Notebook },
+  book: { label: "Book", icon: CreditCard, submitIcon: Receipt },
 }
 
 const MODE_PLACEHOLDERS: Record<ChatMode, string> = {
@@ -34,22 +34,12 @@ const MODE_PLACEHOLDERS: Record<ChatMode, string> = {
 } as const
 
 function getContextualPlaceholder(mode: ChatMode, _selectedCountry: string): string {
-  switch (mode) {
-    case "explore":
-      return "What would you like to know?"
-    case "plan":
-      return "What do you want to do?"
-    case "book":
-      return "How do you want to get there?"
-    default:
-      return MODE_PLACEHOLDERS[mode]
+  const placeholders: Record<ChatMode, string> = {
+    explore: "What would you like to know?",
+    plan: "What do you want to do?",
+    book: "How do you want to get there?",
   }
-}
-
-const MODE_SUBMIT_ICONS: Record<ChatMode, typeof Telescope> = {
-  explore: Telescope,
-  plan: Notebook,
-  book: Receipt,
+  return placeholders[mode] ?? MODE_PLACEHOLDERS[mode]
 }
 
 export function ChatInput({
@@ -80,6 +70,7 @@ export function ChatInput({
   const [internalMode, setInternalMode] = useState<ChatMode>("explore")
   const mode = modeProp ?? internalMode
   const setMode = onModeChange ?? setInternalMode
+  const { icon: ModeIcon, label: modeLabel, submitIcon: SubmitIcon } = MODE_CONFIG[mode]
 
   const placeholder =
     showModeSelector && selectedCountry
@@ -118,7 +109,7 @@ export function ChatInput({
     onInputChange?.(v)
   }
 
-  const SubmitIcon = showModeSelector ? MODE_SUBMIT_ICONS[mode] : Send
+  const SubmitIconComponent = showModeSelector ? SubmitIcon : Send
 
   const countrySuggestions = useMemo(
     () => (inputValue.trim() ? getMatchingCountries(inputValue) : []),
@@ -161,26 +152,21 @@ export function ChatInput({
                   size="sm"
                   className="h-9 shrink-0 gap-1.5 rounded-full px-3 font-departure-mono text-sm"
                 >
-                  {mode === "explore" && <Compass className="size-4 shrink-0" />}
-                  {mode === "plan" && <Map className="size-4 shrink-0" />}
-                  {mode === "book" && <CreditCard className="size-4 shrink-0" />}
-                  {MODE_LABELS[mode]}
+                  <ModeIcon className="size-4 shrink-0" />
+                  {modeLabel}
                   <ChevronDown className="size-4 shrink-0" />
                 </PrimaryGrowButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="font-departure-mono">
-                <DropdownMenuItem onClick={() => { setMode("explore"); setInputValue("") }}>
-                  <Compass className="size-4" />
-                  Explore
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setMode("plan"); setInputValue("") }}>
-                  <Map className="size-4" />
-                  Plan
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setMode("book"); setInputValue("") }}>
-                  <CreditCard className="size-4" />
-                  Book
-                </DropdownMenuItem>
+                {(Object.keys(MODE_CONFIG) as ChatMode[]).map((m) => {
+                  const { icon: Icon, label } = MODE_CONFIG[m];
+                  return (
+                    <DropdownMenuItem key={m} onClick={() => { setMode(m); setInputValue("") }}>
+                      <Icon className="size-4" />
+                      {label}
+                    </DropdownMenuItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -195,7 +181,7 @@ export function ChatInput({
             {isLoading ? (
               <Square className="h-4 w-4 fill-current" />
             ) : (
-              <SubmitIcon className="h-4 w-4" />
+              <SubmitIconComponent className="h-4 w-4" />
             )}
           </Button>
         </PromptInputActions>

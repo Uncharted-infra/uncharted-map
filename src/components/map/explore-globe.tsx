@@ -215,22 +215,10 @@ export function ExploreGlobe({
               const name = getCountryName(geo);
               const isHighlighted =
                 highlightedCountry === name || (!highlightedCountry && selectedCountry === name);
-              const useConfirmedColor = isHighlighted && isConfirmed;
-              const baseFill = isHighlighted
-                ? useConfirmedColor
-                  ? "hsl(var(--globe-highlight-confirmed))"
-                  : "hsl(var(--globe-highlight))"
-                : "hsl(var(--globe-country-fill))";
-              const strokeColor = isHighlighted
-                ? useConfirmedColor
-                  ? "hsl(var(--globe-highlight-confirmed))"
-                  : "hsl(var(--globe-highlight))"
-                : "hsl(var(--globe-country-stroke))";
-              const hoverFill = isHighlighted
-                ? useConfirmedColor
-                  ? "hsl(var(--globe-highlight-confirmed-hover))"
-                  : "hsl(var(--globe-highlight-hover))"
-                : "hsl(var(--globe-country-hover))";
+              const suffix = !isHighlighted ? "country" : isConfirmed ? "highlight-confirmed" : "highlight";
+              const baseFill = `hsl(var(--globe-${suffix === "country" ? "country-fill" : suffix}))`;
+              const strokeColor = `hsl(var(--globe-${suffix === "country" ? "country-stroke" : suffix}))`;
+              const hoverFill = `hsl(var(--globe-${suffix === "country" ? "country-hover" : suffix + "-hover"}))`;
               return (
                 <Geography
                   key={geo.rsmKey}
