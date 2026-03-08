@@ -21,8 +21,10 @@ import {
   MapPin,
   Building2,
   Plane,
-  Activity,
   FileText,
+  CalendarDays,
+  Receipt,
+  Stamp,
   MoreVertical,
   Share2,
   Users,
@@ -76,9 +78,9 @@ const luggageItems = [
 ] as const;
 
 const documentItems = [
-  { icon: Plane, label: "Flights", href: "/documents/flights" },
-  { icon: Building2, label: "Hotels", href: "/documents/hotels" },
-  { icon: Activity, label: "Activities", href: "/documents/activities" },
+  { icon: CalendarDays, label: "Itinerary", href: "/documents/itinerary" },
+  { icon: Receipt, label: "Receipts", href: "/documents/receipts" },
+  { icon: Stamp, label: "Visas", href: "/documents/visas" },
 ] as const;
 
 function ThemeRadioGroup({ theme, setTheme }: { theme: string | undefined; setTheme: (v: string) => void }) {
