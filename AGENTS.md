@@ -66,5 +66,4 @@ Guidelines for AI agents working in this codebase. Follow these rules to ensure 
 | **Verify Plan** | Check in before starting implementation |
 | **Track Progress** | Mark items complete as you go |
 | **Explain Changes** | High-level summary at each step |
-| **Document Results** | Add review section to `tasks/todo.md` |
 | **Capture Lessons** | Update `tasks/lessons.md` after corrections |

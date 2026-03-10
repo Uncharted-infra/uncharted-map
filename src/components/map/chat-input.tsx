@@ -35,8 +35,8 @@ const MODE_PLACEHOLDERS: Record<ChatMode, string> = {
 
 function getContextualPlaceholder(mode: ChatMode, _selectedCountry: string): string {
   const placeholders: Record<ChatMode, string> = {
-    explore: "What would you like to know?",
-    plan: "What do you want to do?",
+    explore: "Where do you want to go?",
+    plan: "What do you want to do when you're there?",
     book: "How do you want to get there?",
   }
   return placeholders[mode] ?? MODE_PLACEHOLDERS[mode]
