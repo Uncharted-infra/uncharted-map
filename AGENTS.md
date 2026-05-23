@@ -67,3 +67,9 @@ Guidelines for AI agents working in this codebase. Follow these rules to ensure 
 | **Track Progress** | Mark items complete as you go |
 | **Explain Changes** | High-level summary at each step |
 | **Capture Lessons** | Update `tasks/lessons.md` after corrections |
+
+---
+
+## Product execution docs (repo root)
+
+When work touches **trip semantics, phases (Explore / Plan / Book), demo dates, ICP, metrics, or tools**, read the bundle under **`../docs/`**. Start with **[`../docs/doc-map-and-conventions.md`](../docs/doc-map-and-conventions.md)** (glossary and “when you change X, update Y”), then the focused file from **[`../docs/README.md`](../docs/README.md)**.

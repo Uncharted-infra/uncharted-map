@@ -1,30 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Earth } from "lucide-react";
-import { SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
-import type { ChatMode } from "./chat-input";
+import { Check, Copy, Earth, ThumbsDown, ThumbsUp } from "lucide-react";
 
-const GLOBE_PANEL_WIDTH = Math.round(SIDEBAR_WIDTH_EXPANDED * 2.3);
-const GLOBE_SECTION_WIDTH = 24 + 1 + GLOBE_PANEL_WIDTH;
-const GLOBE_ANIMATION_MS = 450;
-const AGENT_MESSAGE_TEXT =
-  "I can help with a variety of tasks: answering questions, providing information, assisting with coding, generating creative content. What would you like help with today?";
-
-const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full min-w-0 max-w-full flex flex-col min-h-0 overflow-hidden rounded-full border border-border bg-card px-4 py-2.5 shadow-sm animate-pulse">
-      <div className="h-9 bg-muted/50 rounded-md" />
-    </div>
-  ),
-});
-import { ExploreGlobe } from "./explore-globe";
-import { findMatchingCountry, COUNTRY_NAMES } from "@/data/globe-countries";
-import { getChatState, setChatState } from "@/lib/chat-state";
-import { useTrips } from "@/contexts/trips-context";
-import { useNewTrip } from "@/contexts/new-trip-context";
 import {
   Message,
   MessageAction,
@@ -34,41 +13,132 @@ import {
 } from "@/components/prompt-kit/message";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Check, Copy, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ExploreGlobe } from "./explore-globe";
+
+import type { ChatMode } from "./chat-input";
+import { SIDEBAR_WIDTH_EXPANDED } from "@/contexts/sidebar-context";
+import { useNewTrip } from "@/contexts/new-trip-context";
+import { useTrips } from "@/contexts/trips-context";
+
+import { findMatchingCountry, COUNTRY_NAMES } from "@/data/globe-countries";
+import { getIntroAssistantReply, getStubAssistantReply } from "@/lib/agent-stub";
+import { getChatState, setChatState } from "@/lib/chat-state";
+import {
+  clearConversation,
+  createTurn,
+  loadConversation,
+  saveConversation,
+} from "@/lib/conversation-thread";
+import type { ChatTurn } from "@/lib/conversation-thread";
 import { cn } from "@/lib/utils";
+
+const GLOBE_PANEL_WIDTH = Math.round(SIDEBAR_WIDTH_EXPANDED * 2.3);
+const GLOBE_SECTION_WIDTH = 24 + 1 + GLOBE_PANEL_WIDTH;
+const GLOBE_ANIMATION_MS = 450;
+
+function isChatMode(value: string | null): value is ChatMode {
+  return value === "explore" || value === "plan" || value === "book";
+}
+
+const ChatInput = dynamic(() => import("./chat-input").then((m) => ({ default: m.ChatInput })), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full min-w-0 max-w-full flex flex-col min-h-0 overflow-hidden rounded-full border border-border bg-card px-4 py-2.5 shadow-sm animate-pulse">
+      <div className="h-9 bg-muted/50 rounded-md" />
+    </div>
+  ),
+});
 
 export function ConversationPanel({ className }: { className?: string }) {
   const { addTrip } = useTrips();
   const newTrip = useNewTrip();
-  const [hasMessages, setHasMessages] = useState(false);
+
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [mode, setMode] = useState<ChatMode>("explore");
   const [exploreInput, setExploreInput] = useState("");
+  const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [liked, setLiked] = useState<boolean | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const urlBootstrapped = useRef(false);
+
+  const persistConversation = useCallback((nextTurns: ChatTurn[], pinnedCountry: string | null) => {
+    saveConversation({ v: 1, pinnedCountry, turns: nextTurns });
+  }, []);
+
+  /* Deep-link from marketing (?q=&mode=) — keep globe, strip query silently */
+  useEffect(() => {
+    if (urlBootstrapped.current || typeof window === "undefined") return;
+    urlBootstrapped.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q")?.trim();
+    const modeParam = params.get("mode");
+
+    if (modeParam && isChatMode(modeParam)) {
+      setMode(modeParam);
+    }
+    if (q) {
+      setExploreInput(q);
+    }
+
+    if (q || (modeParam && isChatMode(modeParam))) {
+      params.delete("q");
+      params.delete("mode");
+      const qs = params.toString();
+      const next = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+      window.history.replaceState(null, "", next);
+    }
+  }, []);
+
+  /* Restore persisted thread + geography */
   useEffect(() => {
     const stored = getChatState();
+    const persisted = loadConversation();
+
     if (stored.country && COUNTRY_NAMES.includes(stored.country)) {
       setSelectedCountry(stored.country);
       setMode(stored.mode);
     }
+
+    if (
+      persisted &&
+      persisted.turns.length > 0 &&
+      persisted.pinnedCountry &&
+      stored.country &&
+      persisted.pinnedCountry === stored.country &&
+      COUNTRY_NAMES.includes(stored.country)
+    ) {
+      setTurns(persisted.turns);
+      setIsConfirmed(true);
+    }
   }, []);
 
+  /* resetKey stays 0 on first paint — avoid wiping restored session */
   useEffect(() => {
-    if (newTrip?.resetKey) {
-      setHasMessages(false);
-      setIsConfirmed(false);
-      setSelectedCountry(null);
-      setMode("explore");
-      setExploreInput("");
-    }
-  }, [newTrip?.resetKey]);
+    if (!newTrip || newTrip.resetKey === 0) return;
+    clearConversation();
+    setIsConfirmed(false);
+    setSelectedCountry(null);
+    setMode("explore");
+    setExploreInput("");
+    setTurns([]);
+    setCopiedId(null);
+  }, [newTrip?.resetKey, newTrip]);
+
+  useEffect(() => {
+    if (!isConfirmed || !selectedCountry) return;
+    persistConversation(turns, selectedCountry);
+  }, [turns, isConfirmed, selectedCountry, persistConversation]);
 
   const handleSend = (message: string) => {
-    setHasMessages(true);
-    void message;
+    const trimmed = message.trim();
+    if (!trimmed || !isConfirmed || !selectedCountry) return;
+
+    const userTurn = createTurn("user", trimmed);
+    const reply = createTurn("assistant", getStubAssistantReply(mode, selectedCountry, trimmed));
+    setTurns((prev) => [...prev, userTurn, reply]);
   };
 
   const handleModeChange = (newMode: ChatMode) => {
@@ -82,19 +152,39 @@ export function ConversationPanel({ className }: { className?: string }) {
   const handleCountrySelect = (country: string) => {
     const value = country.trim() || null;
     if (!value) return;
+
+    const trimmedExplore = exploreInput.trim();
+    const userLine =
+      trimmedExplore ||
+      (mode === "plan"
+        ? `Help me plan a trip focused on ${value}`
+        : mode === "book"
+          ? `I'm ready to book travel for ${value}`
+          : `I'd like to explore ${value}`);
+
     setSelectedCountry(value);
     setChatState(value, mode);
     setExploreInput("");
     addTrip(value, mode);
+
+    const seed: ChatTurn[] = [
+      createTurn("user", userLine),
+      createTurn("assistant", getIntroAssistantReply(mode, value)),
+    ];
+    setTurns(seed);
+    persistConversation(seed, value);
     setIsConfirmed(true);
   };
 
-  const handleCopyAgentMessage = () => {
-    navigator.clipboard.writeText(AGENT_MESSAGE_TEXT).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const handleCopyTurn = (id: string, text: string) => {
+    void navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
     });
   };
+
+  const lastAssistantId =
+    [...turns].reverse().find((t) => t.role === "assistant")?.id ?? null;
 
   const [globePanelExpanded, setGlobePanelExpanded] = useState(true);
   const [isGlobeExiting, setIsGlobeExiting] = useState(false);
@@ -130,25 +220,20 @@ export function ConversationPanel({ className }: { className?: string }) {
     }
   };
 
-  const showGlobe = !hasMessages || isConfirmed;
-  const highlightedCountry = useMemo(
-    () =>
-      selectedCountry
-        ? selectedCountry
-        : showGlobe
-          ? findMatchingCountry(exploreInput)
-          : null,
-    [showGlobe, exploreInput, selectedCountry]
-  );
+  const highlightedCountry = useMemo(() => {
+    if (selectedCountry) return selectedCountry;
+    return findMatchingCountry(exploreInput);
+  }, [exploreInput, selectedCountry]);
+
   const centerOnCountry = useMemo(() => {
-    if (!showGlobe || !highlightedCountry) return null;
+    if (!highlightedCountry) return null;
     if (selectedCountry) return selectedCountry;
     const trimmed = exploreInput.trim();
     if (!trimmed) return null;
     return trimmed.toLowerCase() === highlightedCountry.toLowerCase()
       ? highlightedCountry
       : null;
-  }, [showGlobe, highlightedCountry, exploreInput, selectedCountry]);
+  }, [highlightedCountry, exploreInput, selectedCountry]);
 
   if (isConfirmed) {
     return (
@@ -170,73 +255,86 @@ export function ConversationPanel({ className }: { className?: string }) {
           <div className="flex-1 min-h-0 overflow-auto min-w-0 flex flex-col items-center">
             <TooltipProvider delayDuration={0}>
               <div className="flex flex-col gap-8 w-full min-w-0 max-w-2xl px-4 py-6 mx-auto">
-                <Message className="justify-end min-w-0 w-full max-w-full">
-                  <MessageContent className="min-w-0">
-                    {selectedCountry
-                      ? `I'd like to explore ${selectedCountry}`
-                      : "Hello! How can I help you today?"}
-                  </MessageContent>
-                </Message>
+                {turns.map((turn) =>
+                  turn.role === "user" ? (
+                    <Message key={turn.id} className="justify-end min-w-0 w-full max-w-full">
+                      <MessageContent className="min-w-0">{turn.content}</MessageContent>
+                    </Message>
+                  ) : (
+                    <Message key={turn.id} className="justify-start items-center min-w-0 w-full max-w-full">
+                      <MessageAvatar
+                        src="/img/logo/logo.png"
+                        alt="Uncharted"
+                        fallback="U"
+                        className="self-center shrink-0 -mt-[45px]"
+                      />
+                      <div className="flex w-full min-w-0 flex-col gap-2">
+                        <MessageContent markdown className="bg-transparent p-0 font-fenix min-w-0">
+                          {turn.content}
+                        </MessageContent>
 
-                <Message className="justify-start items-center min-w-0 w-full max-w-full">
-                  <MessageAvatar src="/img/logo/logo.png" alt="Uncharted" fallback="U" className="self-center shrink-0 -mt-[45px]" />
-                  <div className="flex w-full min-w-0 flex-col gap-2">
-                    <MessageContent markdown className="bg-transparent p-0 font-fenix min-w-0">
-                      {AGENT_MESSAGE_TEXT}
-                    </MessageContent>
+                        {turn.id === lastAssistantId ? (
+                          <MessageActions className="self-end">
+                            <MessageAction
+                              tooltip={
+                                copiedId === turn.id ? "Copied!" : "Copy to clipboard"
+                              }
+                            >
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 rounded-full transition-colors duration-150 ease-out"
+                                onClick={() => handleCopyTurn(turn.id, turn.content)}
+                              >
+                                {copiedId === turn.id ? (
+                                  <Check className="size-4 text-green-500 transition-colors duration-200" />
+                                ) : (
+                                  <Copy className="size-4" />
+                                )}
+                              </Button>
+                            </MessageAction>
 
-                    <MessageActions className="self-end">
-                      <MessageAction tooltip={copied ? "Copied!" : "Copy to clipboard"}>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full transition-colors duration-150 ease-out"
-                          onClick={handleCopyAgentMessage}
-                        >
-                          {copied ? (
-                            <Check className="size-4 text-green-500 transition-colors duration-200" />
-                          ) : (
-                            <Copy className="size-4" />
-                          )}
-                        </Button>
-                      </MessageAction>
+                            <MessageAction tooltip="Helpful">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
+                                  liked === true &&
+                                    "bg-green-100 text-green-500 dark:bg-green-950 dark:text-green-400"
+                                )}
+                                onClick={() => {
+                                  setLiked(true);
+                                  setTimeout(() => setLiked(null), 400);
+                                }}
+                              >
+                                <ThumbsUp className="size-4" />
+                              </Button>
+                            </MessageAction>
 
-                      <MessageAction tooltip="Helpful">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={cn(
-                            "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
-                            liked === true && "bg-green-100 text-green-500 dark:bg-green-950 dark:text-green-400"
-                          )}
-                          onClick={() => {
-                            setLiked(true);
-                            setTimeout(() => setLiked(null), 400);
-                          }}
-                        >
-                          <ThumbsUp className="size-4" />
-                        </Button>
-                      </MessageAction>
-
-                      <MessageAction tooltip="Not helpful">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={cn(
-                            "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
-                            liked === false && "bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400"
-                          )}
-                          onClick={() => {
-                            setLiked(false);
-                            setTimeout(() => setLiked(null), 400);
-                          }}
-                        >
-                          <ThumbsDown className="size-4" />
-                        </Button>
-                      </MessageAction>
-                    </MessageActions>
-                  </div>
-                </Message>
+                            <MessageAction tooltip="Not helpful">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn(
+                                  "h-8 w-8 rounded-full transition-colors duration-150 ease-out",
+                                  liked === false &&
+                                    "bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400"
+                                )}
+                                onClick={() => {
+                                  setLiked(false);
+                                  setTimeout(() => setLiked(null), 400);
+                                }}
+                              >
+                                <ThumbsDown className="size-4" />
+                              </Button>
+                            </MessageAction>
+                          </MessageActions>
+                        ) : null}
+                      </div>
+                    </Message>
+                  )
+                )}
               </div>
             </TooltipProvider>
           </div>
@@ -289,7 +387,7 @@ export function ConversationPanel({ className }: { className?: string }) {
                     className="w-full h-full"
                     highlightedCountry={highlightedCountry}
                     centerOnCountry={centerOnCountry}
-                    onCountrySelect={isConfirmed ? undefined : handleCountrySelect}
+                    onCountrySelect={undefined}
                     isConfirmed={isConfirmed}
                   />
                 </div>
@@ -297,28 +395,6 @@ export function ConversationPanel({ className }: { className?: string }) {
             </div>
           </div>
         )}
-      </div>
-    );
-  }
-
-  if (hasMessages) {
-    return (
-      <div className={cn("flex flex-col h-full bg-background p-4 min-w-0 overflow-hidden", className)}>
-        <div className="flex-1 min-h-0" />
-        <div className="flex items-center gap-2 w-full min-w-0 max-w-full overflow-visible">
-          <div className="flex-1 min-w-0 w-full overflow-visible">
-            <ChatInput
-              onSend={handleSend}
-              mode={mode}
-              onModeChange={handleModeChange}
-              onInputChange={setExploreInput}
-              value={exploreInput}
-              showModeSelector={!!selectedCountry}
-              selectedCountry={selectedCountry}
-              onCountrySelect={handleCountrySelect}
-            />
-          </div>
-        </div>
       </div>
     );
   }

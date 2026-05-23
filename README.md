@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+By default Map runs at [http://localhost:3001](http://localhost:3001) so `uncharted-site` can use `NEXT_PUBLIC_MAP_ORIGIN` (default `http://localhost:3001`) alongside the marketing app on `:3000`.
 
 ## Structure
 

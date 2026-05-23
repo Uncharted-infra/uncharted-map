@@ -1,30 +1,36 @@
 # Auth Implementation Instructions
 
-Use this when building auth for the landing site (uncharted.sh) and app (uncharted-map).
+Use this when building auth for the landing site (uncharted.sh) and app (map.uncharted.sh).
+
+**Database:** One Supabase project (`pbuwfdpakmggfsetaztq`) — auth, profiles, and future trip/booking tables. No separate site project.
 
 ---
 
 ## Part 1: Landing Site (uncharted.sh)
 
-**Sign-up button** — Link or redirect to app.uncharted.sh/auth/signin. No API calls, no POST. User leaves the landing page and lands on the app’s sign-in page.
+Signup/login UI on `/signup` and `/login`. After auth, redirect to **map.uncharted.sh**. Same Supabase project as the map app.
 
 ---
 
 ## Part 2: Supabase Setup (do first)
 
-**Project** — Create Supabase project if needed.
+**Project** — `pbuwfdpakmggfsetaztq` (single project for auth + product data).
 
-**Google SSO** — In Google Cloud Console: create OAuth client, set redirect URI to your Supabase auth callback URL, add uncharted.sh and app.uncharted.sh as authorized origins. Copy Client ID and Secret into Supabase Dashboard → Auth → Providers → Google.
+**Google SSO** — In Google Cloud Console: create OAuth client, set redirect URI to your Supabase auth callback URL, add uncharted.sh and map.uncharted.sh as authorized origins. Copy Client ID and Secret into Supabase Dashboard → Auth → Providers → Google.
 
-**Azure SSO** — In Microsoft Entra ID: register app, set redirect URI to same Supabase callback. Copy Client ID and Secret into Supabase Dashboard → Auth → Providers → Azure.
+**Redirect URLs** — In Supabase Auth → URL Configuration, add:
 
-**Redirect URLs** — In Supabase Auth → URL Configuration, add app.uncharted.sh/auth/callback and uncharted.sh/*.
+- `https://uncharted.sh/auth/callback`
+- `https://map.uncharted.sh/auth/callback`
+- localhost callbacks for dev
 
-**Email OTP template** — In Auth → Email Templates, ensure the OTP template includes the Token placeholder so users receive a 6-digit code.
+**Phone** — Auth → Providers → Phone + SMS provider.
+
+See **[../../docs/auth-setup.md](../../docs/auth-setup.md)** for the full checklist.
 
 ---
 
-## Part 3: Database (uncharted-map)
+## Part 3: Database (same Supabase project)
 
 **profiles** — Table with id (auth.users), email, display_name, avatar_url, preferences (JSONB), onboarding_completed_at, onboarding_step. Enable RLS so users only access their own row.
 
@@ -34,32 +40,16 @@ Use this when building auth for the landing site (uncharted.sh) and app (unchart
 
 ---
 
-## Part 4: App Implementation (uncharted-map)
+## Part 4: App Implementation
 
-**1. Dependencies** — Add @supabase/supabase-js and @supabase/ssr.
+**uncharted-site** — Auth UI, OAuth callback, redirects to map.
 
-**2. Env** — Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.
+**uncharted-map** — Middleware auth gate, shared session cookies, optional `/auth/callback`.
 
-**3. Supabase client** — Browser client for client components. Server client with cookies for server routes and middleware.
-
-**4. Auth callback route** — Handle OAuth redirect. Exchange code for session, set cookies, redirect to app or MFA.
-
-**5. Sign-in page** — Buttons for Google and Microsoft. Call signInWithOAuth with redirectTo pointing at auth/callback.
-
-**6. MFA page** — If account_security.mfa_required is true after sign-in, show modal. Send OTP to user email, user enters code, verify, then set mfa_required false and continue.
-
-**7. Onboarding page** — Multi-step flow. Collect travel preferences, personality, etc. Write to profiles.preferences. Set onboarding_completed_at when done. Redirect to main app.
-
-**8. Auth gate** — Middleware or layout: if no session, redirect to auth/signin.
-
-**9. MFA gate** — After auth: if mfa_required, redirect to auth/mfa before showing app.
-
-**10. Onboarding gate** — If onboarding_completed_at is null, redirect to onboarding before main app.
-
-**11. Settings modal** — On open, load profile and preferences. On save, update profiles.preferences.
+Both use identical `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
 ---
 
 ## Flow Summary
 
-Landing sign-up → app sign-in (SSO) → callback → MFA (if required) → onboarding (if first time) → main app.
+Landing sign-up → session on `.uncharted.sh` → map.uncharted.sh (same Supabase user) → MFA (if required) → onboarding (if first time) → main app.
