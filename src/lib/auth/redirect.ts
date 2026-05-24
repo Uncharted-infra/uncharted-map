@@ -1,20 +1,56 @@
-import { mapOrigin, siteOrigin } from "@/lib/supabase/env";
+import {
+  isLocalhostOrigin,
+  PROD_MAP_ORIGIN,
+  PROD_SITE_ORIGIN,
+  resolveMapOrigin,
+  resolveMapOriginFromRequest,
+  resolveSiteOrigin,
+  resolveSiteOriginFromRequest,
+} from "@/lib/auth/origins";
 
 export function appRedirectUrl(): string {
-  return `${mapOrigin()}/`;
+  return `${resolveMapOrigin()}/`;
 }
 
-export function authCallbackUrl(next?: string): string {
-  const target = next || appRedirectUrl();
-  return `${mapOrigin()}/auth/callback?next=${encodeURIComponent(target)}`;
+export function authCallbackUrl(next?: string, requestUrl?: string): string {
+  const mapOrigin = requestUrl
+    ? resolveMapOriginFromRequest(requestUrl)
+    : resolveMapOrigin();
+  const target = next
+    ? sanitizeRedirectUrl(next, requestUrl)
+    : `${mapOrigin}/`;
+  return `${mapOrigin}/auth/callback?next=${encodeURIComponent(target)}`;
 }
 
-export function sanitizeRedirectUrl(next: string | null | undefined): string {
-  if (!next?.trim()) return appRedirectUrl();
+export function sanitizeRedirectUrl(
+  next: string | null | undefined,
+  requestUrl?: string
+): string {
+  const fallback = requestUrl
+    ? `${resolveMapOriginFromRequest(requestUrl)}/`
+    : appRedirectUrl();
+
+  if (!next?.trim()) return fallback;
 
   try {
     const url = new URL(next);
-    const allowedOrigins = [mapOrigin(), siteOrigin()];
+    const onProduction =
+      requestUrl != null &&
+      (resolveMapOriginFromRequest(requestUrl) === PROD_MAP_ORIGIN ||
+        resolveSiteOriginFromRequest(requestUrl) === PROD_SITE_ORIGIN);
+
+    if (onProduction && isLocalhostOrigin(url.origin)) {
+      return fallback;
+    }
+
+    const allowedOrigins = requestUrl
+      ? [
+          resolveMapOriginFromRequest(requestUrl),
+          resolveSiteOriginFromRequest(requestUrl),
+          PROD_MAP_ORIGIN,
+          PROD_SITE_ORIGIN,
+        ]
+      : [resolveMapOrigin(), resolveSiteOrigin(), PROD_MAP_ORIGIN, PROD_SITE_ORIGIN];
 
     if (allowedOrigins.includes(url.origin)) {
       return url.toString();
@@ -23,5 +59,5 @@ export function sanitizeRedirectUrl(next: string | null | undefined): string {
     // Fall through to default.
   }
 
-  return appRedirectUrl();
+  return fallback;
 }

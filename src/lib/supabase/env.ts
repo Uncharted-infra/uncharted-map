@@ -11,9 +11,23 @@ function isProductionDeploy(): boolean {
   );
 }
 
+function isLocalhostOrigin(value: string): boolean {
+  try {
+    return new URL(value).hostname === "localhost";
+  } catch {
+    return false;
+  }
+}
+
 function originFromEnv(name: string, prodDefault: string, devDefault: string): string {
   const fromEnv = process.env[name]?.trim();
-  if (fromEnv) return fromEnv.replace(/\/+$/, "");
+  if (fromEnv) {
+    const normalized = fromEnv.replace(/\/+$/, "");
+    if (isProductionDeploy() && isLocalhostOrigin(normalized)) {
+      return prodDefault;
+    }
+    return normalized;
+  }
   if (isProductionDeploy()) return prodDefault;
   return devDefault;
 }
