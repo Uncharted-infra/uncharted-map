@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ThemeFavicon } from "@/components/theme-favicon";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { themeFaviconMetadata } from "@/lib/favicon-metadata";
 import "./globals.css";
 
 const fenix = localFont({
@@ -26,9 +28,7 @@ const wenkaiMonoBold = localFont({
 export const metadata: Metadata = {
   title: "Map",
   description: "Planning and booking travel is now a single conversation.",
-  icons: {
-    icon: "/img/logo/logo.png",
-  },
+  icons: themeFaviconMetadata,
 };
 
 export default function RootLayout({
@@ -39,7 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${fenix.variable} ${departureMono.variable} ${wenkaiMono.variable} ${wenkaiMonoBold.variable}`}>
       <body suppressHydrationWarning>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ThemeFavicon />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
