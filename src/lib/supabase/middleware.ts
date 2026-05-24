@@ -1,19 +1,30 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-import {
-  authCookieDomain,
-  supabaseAnonKey,
-  supabaseUrl,
-} from "./env";
+import { authCookieDomain } from "./env";
 
-const PUBLIC_ROUTES = ["/login", "/signup"];
+/** Supabase config for middleware — optional so the map stays public if env is missing. */
+function supabaseConfig(): { url: string; anonKey: string } | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const anonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
+  if (!url || !anonKey) return null;
+  return { url, anonKey };
+}
+
+/** Refresh auth session when configured. Map browsing is public (anonymous OK). */
 export async function updateSession(request: NextRequest) {
+  const config = supabaseConfig();
+  if (!config) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
   const cookieDomain = authCookieDomain();
 
-  const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
+  const supabase = createServerClient(config.url, config.anonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -33,20 +44,7 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
-  const isPublicRoute =
-    pathname.startsWith("/auth") ||
-    PUBLIC_ROUTES.some((route) => pathname === route);
-
-  if (!user && !isPublicRoute) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", request.url);
-    return NextResponse.redirect(loginUrl);
-  }
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
