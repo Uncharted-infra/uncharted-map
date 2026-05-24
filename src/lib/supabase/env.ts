@@ -1,6 +1,23 @@
 /** Canonical Supabase project ref — auth + all product data (one project until scale-out). */
 export const SUPABASE_PROJECT_REF = "epgtqkixcynukyqoeioo";
 
+const PROD_SITE_ORIGIN = "https://uncharted.sh";
+const PROD_MAP_ORIGIN = "https://map.uncharted.sh";
+
+function isProductionDeploy(): boolean {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NODE_ENV === "production"
+  );
+}
+
+function originFromEnv(name: string, prodDefault: string, devDefault: string): string {
+  const fromEnv = process.env[name]?.trim();
+  if (fromEnv) return fromEnv.replace(/\/+$/, "");
+  if (isProductionDeploy()) return prodDefault;
+  return devDefault;
+}
+
 function required(name: string, value: string | undefined): string {
   if (!value?.trim()) {
     throw new Error(`Missing required environment variable: ${name}`);
@@ -31,13 +48,17 @@ export function authCookieDomain(): string | undefined {
 }
 
 export function siteOrigin(): string {
-  const raw =
-    process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim() || "http://localhost:3000";
-  return raw.replace(/\/+$/, "");
+  return originFromEnv(
+    "NEXT_PUBLIC_SITE_ORIGIN",
+    PROD_SITE_ORIGIN,
+    "http://localhost:3000"
+  );
 }
 
 export function mapOrigin(): string {
-  const raw =
-    process.env.NEXT_PUBLIC_MAP_ORIGIN?.trim() || "http://localhost:3001";
-  return raw.replace(/\/+$/, "");
+  return originFromEnv(
+    "NEXT_PUBLIC_MAP_ORIGIN",
+    PROD_MAP_ORIGIN,
+    "http://localhost:3001"
+  );
 }
