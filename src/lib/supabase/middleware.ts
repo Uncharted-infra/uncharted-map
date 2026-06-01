@@ -45,8 +45,15 @@ function authGateRedirect(request: NextRequest): NextResponse {
 
 /** Refresh session and require auth — unauthenticated users go to signup / login. */
 export async function updateSession(request: NextRequest) {
-  const config = supabaseConfig();
   const pathname = request.nextUrl.pathname;
+
+  // Local map dev: skip Edge → Supabase entirely unless MAP_DEV_AUTH=1.
+  // Stale sb-* cookies otherwise spam "fetch failed" on every navigation.
+  if (isLocalDevMap(request) && process.env.MAP_DEV_AUTH !== "1") {
+    return NextResponse.next({ request });
+  }
+
+  const config = supabaseConfig();
 
   if (!config) {
     if (!isPublicRoute(pathname)) {
