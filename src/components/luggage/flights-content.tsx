@@ -21,6 +21,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { PrimaryGrowButton, DestructiveGrowButton } from "@/components/ui/grow-button";
+import { FlightSearchPanel } from "@/components/luggage/flight-search-panel";
 import { PageShell, EmptyState } from "@/components/shared/page-shell";
 import {
   getFlights,
@@ -45,8 +46,12 @@ export function FlightsContent() {
   const [flightClass, setFlightClass] = useState<FlightClass>("economy");
   const [price, setPrice] = useState("");
 
-  useEffect(() => {
+  const refreshFlights = () => {
     setFlights(getFlights());
+  };
+
+  useEffect(() => {
+    refreshFlights();
   }, []);
 
   const handleAdd = () => {
@@ -83,6 +88,8 @@ export function FlightsContent() {
         </PrimaryGrowButton>
       }
     >
+      <FlightSearchPanel onSaved={refreshFlights} />
+
       {flights.length === 0 ? (
         <EmptyState message="No saved flights yet." />
       ) : (

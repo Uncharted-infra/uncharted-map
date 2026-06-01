@@ -65,9 +65,23 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { id: string } | null = null;
+
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+      // Stale refresh token or Supabase unreachable — common on localhost.
+      if (process.env.NODE_ENV === "development") {
+        return supabaseResponse;
+      }
+    } else {
+      user = data.user;
+    }
+  } catch {
+    if (process.env.NODE_ENV === "development") {
+      return supabaseResponse;
+    }
+  }
 
   if (!user && !isPublicRoute(pathname)) {
     return marketingSignupRedirect(request);

@@ -13,6 +13,6 @@ export const config = {
      * negative-lookahead pattern alone does not match the root path.
      */
     "/",
-    "/((?!_next/static|_next/image|favicon.ico|favicons/.*|img/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|favicons/.*|img/.*|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
