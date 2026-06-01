@@ -43,10 +43,22 @@ export function resolveMapOriginFromRequest(requestUrl: string): string {
   return mapOriginFromEnv();
 }
 
+function isLocalDevHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
 export function resolveSiteOriginFromRequest(requestUrl: string): string {
   try {
     const hostname = new URL(requestUrl).hostname;
     if (isProductionHost(hostname)) return PROD_SITE_ORIGIN;
+    // Map on localhost:3001 must not send users to production signup from .env.
+    if (isLocalDevHostname(hostname)) {
+      const fromEnv = process.env.NEXT_PUBLIC_SITE_ORIGIN?.trim();
+      if (fromEnv && isLocalhostOrigin(fromEnv)) {
+        return fromEnv.replace(/\/+$/, "");
+      }
+      return "http://localhost:3000";
+    }
   } catch {
     // Fall through.
   }

@@ -17,6 +17,12 @@ function supabaseConfig(): { url: string; anonKey: string } | null {
   return { url, anonKey };
 }
 
+function isLocalDevMap(request: NextRequest): boolean {
+  if (process.env.NODE_ENV !== "development") return false;
+  const host = request.nextUrl.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
+
 function isPublicRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/auth") ||
@@ -24,20 +30,27 @@ function isPublicRoute(pathname: string): boolean {
   );
 }
 
-function marketingSignupRedirect(request: NextRequest): NextResponse {
+/** Unauthenticated users → site signup (prod) or map /login (localhost). */
+function authGateRedirect(request: NextRequest): NextResponse {
+  if (isLocalDevMap(request)) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
   const signupUrl = new URL("/signup", resolveSiteOriginFromRequest(request.url));
   signupUrl.searchParams.set("next", request.url);
   return NextResponse.redirect(signupUrl);
 }
 
-/** Refresh session and require auth — unauthenticated users go to uncharted.sh/signup. */
+/** Refresh session and require auth — unauthenticated users go to signup / login. */
 export async function updateSession(request: NextRequest) {
   const config = supabaseConfig();
   const pathname = request.nextUrl.pathname;
 
   if (!config) {
     if (!isPublicRoute(pathname)) {
-      return marketingSignupRedirect(request);
+      return authGateRedirect(request);
     }
     return NextResponse.next({ request });
   }
@@ -58,7 +71,8 @@ export async function updateSession(request: NextRequest) {
         cookiesToSet.forEach(({ name, value, options }) => {
           supabaseResponse.cookies.set(name, value, {
             ...options,
-            ...(cookieDomain ? { domain: cookieDomain } : {}),
+            // Production cookie domain breaks sessions on localhost.
+            ...(cookieDomain && !isLocalDevMap(request) ? { domain: cookieDomain } : {}),
           });
         });
       },
@@ -70,7 +84,6 @@ export async function updateSession(request: NextRequest) {
   try {
     const { data, error } = await supabase.auth.getUser();
     if (error) {
-      // Stale refresh token or Supabase unreachable — common on localhost.
       if (process.env.NODE_ENV === "development") {
         return supabaseResponse;
       }
@@ -84,7 +97,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!user && !isPublicRoute(pathname)) {
-    return marketingSignupRedirect(request);
+    return authGateRedirect(request);
   }
 
   return supabaseResponse;
