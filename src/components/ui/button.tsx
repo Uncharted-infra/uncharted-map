@@ -1,57 +1,43 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+type Variant = "caramel" | "ink" | "ghost";
+type Size = "sm" | "md" | "lg";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium font-departure-mono transition-colors shadow-none focus-visible:outline-none focus-visible:ring-0 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-primary text-primary-foreground",
-        destructive:
-          "bg-destructive text-destructive-foreground",
-        outline:
-          "border border-input bg-background",
-        secondary:
-          "bg-secondary text-secondary-foreground",
-        ghost: "",
-        link: "text-primary underline-offset-4",
-      },
-      size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-xl font-mono text-[13px] font-bold tracking-wide uppercase transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none";
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+const variants: Record<Variant, string> = {
+  caramel: "bg-caramel text-white hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(217,142,50,0.35)]",
+  ink: "bg-ink text-cream hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(26,21,18,0.25)]",
+  ghost: "border border-line bg-white text-ink hover:-translate-y-0.5 hover:border-ink/30",
+};
+
+const sizes: Record<Size, string> = {
+  sm: "px-3 py-1.5 text-[11px]",
+  md: "px-5 py-2.5",
+  lg: "px-7 py-3.5 text-sm",
+};
+
+export function buttonClasses({
+  variant = "caramel",
+  size = "md",
+  className,
+}: {
+  variant?: Variant;
+  size?: Size;
+  className?: string;
+} = {}) {
+  return cn(base, variants[variant], sizes[size], className);
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Button.displayName = "Button"
-
-export { Button, buttonVariants }
+export function Button({
+  variant = "caramel",
+  size = "md",
+  className,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: Variant;
+  size?: Size;
+}) {
+  return <button className={buttonClasses({ variant, size, className })} {...props} />;
+}

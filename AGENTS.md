@@ -1,75 +1,39 @@
-# Agent Instructions
+# AGENTS.md — uncharted-map (owner dashboard + auth)
 
-Guidelines for AI agents working in this codebase. Follow these rules to ensure consistent, high-quality output.
+**map.uncharted.sh** — the shop-owner app for Uncharted. Auth, onboarding, and the insights dashboard that is the product's v1 wedge: **turn a shop's sales data into comprehension** — best sellers, slow days, reorder needs, and what flavors to invent next.
 
----
+Stack: Next.js 16 (App Router) + React 19 + Tailwind v4 + TypeScript strict + Supabase (`@supabase/ssr`). pnpm. Dev on **:3001**.
 
-## Core Principles
+## Product intent
 
-- **Simplicity First** — Make every change as simple as possible. Impact minimal code.
-- **No Laziness** — Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact** — Touch only what's necessary. Avoid introducing bugs.
+The owner should feel like they gained a business brain, not another admin panel:
 
----
+- `/login` `/signup` — Supabase auth (magic link recommended; Google OAuth optional).
+- `/onboarding` — claim or create a shop.
+- `/dashboard` — today snapshot: sales, top item, orders, week sparkline.
+- `/dashboard/orders` — order queue with status transitions.
+- `/dashboard/menu` — menu items, availability toggles.
+- `/dashboard/inventory` — stock levels, low-stock flags, reorder suggestions from sales velocity.
+- `/dashboard/insights` — **the wedge**: best sellers, daypart heatmap, flavor-trend scores, "flavor lab" suggestions.
+- `/dashboard/settings` — shop profile, hours, payout (Phase 6).
 
-## Workflow Orchestration
+**This app owns all secrets.** Supabase keys, auth cookie domain (`.uncharted.sh`), Stripe keys later. Nothing sensitive belongs on the site app.
 
-### 1. Plan Node Default
+## Data layer
 
-- Enter plan mode for **any** non-trivial task (3+ steps or architectural decisions).
-- If something goes sideways: **STOP** and re-plan immediately. Don't keep pushing.
-- Use plan mode for verification steps, not just building.
-- Write detailed specs upfront to reduce ambiguity.
+Same contract as the site: `src/lib/data/` provider interface. `MockProvider` serves seeded Alpharetta data (90 days of `sales_daily` etc.); `SupabaseProvider` swaps in Phase 4 behind an env flag. Dashboard pages must work fully on mock data.
 
-### 2. Subagent Strategy
+## Design rules
 
-- Use subagents liberally to keep the main context window clean.
-- Offload research, exploration, and parallel analysis to subagents.
-- For complex problems, throw more compute at it via subagents.
-- One task per subagent for focused execution.
+- Design source of truth: [`../docs/design-system.md`](../docs/design-system.md). Tokens duplicated in `src/app/globals.css` — keep in sync with the site app's copy.
+- The dashboard is data-dense but stays playful: flavor accents for categories/series, mono font for numbers/labels, no generic SaaS gray.
+- Charts: Recharts. Keep charts flat and legible — no gradients-as-decoration.
 
-### 3. Self-Improvement Loop
+## Engineering rules
 
-- After **any** correction from the user: update `tasks/lessons.md` with the pattern.
-- Write rules for yourself that prevent the same mistake.
-- Ruthlessly iterate on these lessons until the mistake rate drops.
-- Review lessons at session start for the relevant project.
-
-### 4. Verification Before Done
-
-- Never mark a task complete without proving it works.
-- Diff behavior between main and your changes when relevant.
-- Ask yourself: *"Would a staff engineer approve this?"*
-- Run tests, check logs, demonstrate correctness.
-
-### 5. Demand Elegance (Balanced)
-
-- For non-trivial changes: pause and ask *"Is there a more elegant way?"*
-- If a fix feels hacky: *"Knowing everything I know now, implement the elegant solution."*
-- Skip this for simple, obvious fixes — don't over-engineer.
-- Challenge your own work before presenting it.
-
-### 6. Autonomous Bug Fixing
-
-- When given a bug report: just fix it. Don't ask for hand-holding.
-- Point at logs, errors, failing tests — then resolve them.
-- Zero context switching required from the user.
-- Go fix failing CI tests without being told how.
-
----
-
-## Task Management
-
-| Step | Action |
-|------|--------|
-| **Plan First** | Write plan to `tasks/todo.md` with checkable items |
-| **Verify Plan** | Check in before starting implementation |
-| **Track Progress** | Mark items complete as you go |
-| **Explain Changes** | High-level summary at each step |
-| **Capture Lessons** | Update `tasks/lessons.md` after corrections |
-
----
-
-## Product execution docs (repo root)
-
-When work touches **trip semantics, phases (Explore / Plan / Book), demo dates, ICP, metrics, or tools**, read the bundle under **`../docs/`**. Start with **[`../docs/doc-map-and-conventions.md`](../docs/doc-map-and-conventions.md)** (glossary and “when you change X, update Y”), then the focused file from **[`../docs/README.md`](../docs/README.md)**.
+- Simplicity first; minimal diff; root causes, not patches.
+- TypeScript strict, zod at data boundaries.
+- `pnpm lint` + `pnpm build` must pass before calling work done.
+- Run `pnpm dev` on :3001 and verify in the browser.
+- RLS: owner rows scoped via `shop_members`; never query with the service key from the client.
+- No commits/pushes unless the user asks (see root `../AGENTS.md`).

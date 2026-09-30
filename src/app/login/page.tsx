@@ -1,151 +1,31 @@
-"use client";
-
-import { Suspense, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { AuthFormLayout } from "@/components/auth/auth-form-layout";
-import { PhoneAuthForm } from "@/components/auth/phone-auth-form";
-import { SSOButtons } from "@/components/auth/sso-buttons";
-import { redirectAfterAuth, usePostAuthRedirectUrl } from "@/lib/auth/use-post-auth-redirect";
-import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
-
-function LoginForm() {
-  const postAuthRedirect = usePostAuthRedirectUrl();
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { email: "", password: "" },
-  });
-
-  async function onSubmit(data: SignInFormValues) {
-    setSubmitting(true);
-    setSubmitError(null);
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-
-    setSubmitting(false);
-
-    if (error) {
-      setSubmitError(error.message);
-      return;
-    }
-
-    redirectAfterAuth(postAuthRedirect);
-  }
-
-  return (
-    <AuthFormLayout
-      footerLink={{
-        text: "Don't have an account? Get started for free",
-        href: "/signup",
-      }}
-    >
-      <Tabs defaultValue="email" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="email" className="font-departure-mono">
-            Email
-          </TabsTrigger>
-          <TabsTrigger value="phone" className="font-departure-mono">
-            Phone
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="email" className="space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-departure-mono">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="you@example.com"
-                        autoComplete="email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-departure-mono">Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        autoComplete="current-password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {submitError ? (
-                <p className="text-sm text-destructive">{submitError}</p>
-              ) : null}
-              <Button
-                type="submit"
-                className="font-departure-mono w-full"
-                size="lg"
-                disabled={submitting}
-              >
-                {submitting ? "Signing in..." : "Sign in"}
-              </Button>
-              <SSOButtons />
-            </form>
-          </Form>
-        </TabsContent>
-
-        <TabsContent value="phone">
-          <PhoneAuthForm mode="signIn" />
-          <div className="mt-4">
-            <SSOButtons />
-          </div>
-        </TabsContent>
-      </Tabs>
-    </AuthFormLayout>
-  );
-}
+export const metadata = { title: "Sign in — Uncharted" };
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
-      <LoginForm />
-    </Suspense>
+    <main className="flex min-h-screen items-center justify-center px-5">
+      <Card className="w-full max-w-sm p-6">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="inline-block h-3.5 w-3.5 rounded-[4px] bg-caramel" />
+          <span className="font-display text-lg font-medium tracking-tight">Uncharted</span>
+        </Link>
+        <h1 className="mt-6 font-display text-2xl font-medium tracking-tight">Welcome back</h1>
+        <p className="mt-1 text-sm text-muted">We&apos;ll email you a sign-in link. No password.</p>
+        <form className="mt-5 space-y-3">
+          <Input type="email" placeholder="you@yourshop.com" required />
+          <Button type="submit" className="w-full">Send magic link</Button>
+        </form>
+        <p className="mt-4 text-center font-mono text-[11px] tracking-wide text-muted">
+          New here?{" "}
+          <Link href="/signup" className="text-caramel hover:underline">
+            Claim your shop
+          </Link>
+        </p>
+      </Card>
+    </main>
   );
 }

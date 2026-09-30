@@ -1,35 +1,12 @@
-# Map — Uncharted AI Travel Agent
+# uncharted-map
 
-Map is the conversational AI travel agent inside Uncharted. It can explore destinations, plan itineraries, and book hotels, reservations, activities, and transport.
-
-## Tech Stack
-
-- **Framework:** Next.js 15 (App Router)
-- **Components:** shadcn/ui
-- **Icons:** lucide-react
-- **Fonts:** Cormorant Garamond (Fenix), JetBrains Mono (departure-mono)
-
-## Getting Started
+Owner dashboard + auth for Uncharted — the shop-side of the local sweets platform.
+Lives at **map.uncharted.sh**. Owns all Supabase auth/data secrets.
 
 ```bash
-npm install
-npm run dev
+pnpm install
+cp .env.example .env.local   # fill in Supabase keys
+pnpm dev                     # http://localhost:3001
 ```
 
-By default Map runs at [http://localhost:3001](http://localhost:3001) so `uncharted-site` can use `NEXT_PUBLIC_MAP_ORIGIN` (default `http://localhost:3001`) alongside the marketing app on `:3000`.
-
-## Structure
-
-- **Sidebar** (left): Search, Trips, Friends, Luggage, Passport, Profile, Settings
-- **Conversation Panel** (center): Chat with Map, action cards, itinerary
-- **Context Panel** (right): Trip snapshot, itinerary, bookings, budget, quick actions
-
-On mobile, the Context Panel becomes a slide-over sheet (tap the panel button).
-
-## Settings
-
-Visit `/settings` for Account, Travel Preferences, Maps (token usage), Notifications, and Integrations.
-
-## Fonts
-
-The spec calls for Fenix and departure-mono. This build uses Cormorant Garamond and JetBrains Mono as fallbacks. To use the actual Fenix font, add the font files to `fonts/Fenix/` and update `src/app/layout.tsx` with `@font-face` or `next/font/local`.
+See `AGENTS.md` and `../docs/product.md`.
