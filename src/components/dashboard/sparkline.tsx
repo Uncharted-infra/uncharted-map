@@ -17,27 +17,30 @@ export function RevenueSparkline({ days }: { days: DailyRevenue[] }) {
           <XAxis
             dataKey="date"
             tickLine={false}
-            axisLine={false}
-            tick={{ fontSize: 11, fontFamily: "var(--font-mono)", fill: "var(--color-muted)" }}
+            axisLine={{ stroke: "var(--border)", strokeWidth: 2 }}
+            tick={{ fontSize: 11, fontFamily: "var(--font-mono)", fontWeight: 700, fill: "var(--muted-foreground)" }}
           />
           <YAxis hide domain={[0, "dataMax + 200"]} />
           <Tooltip
             formatter={(v) => [formatPrice(Math.round(Number(v) * 100)), "Revenue"]}
+            cursor={{ fill: "rgba(0,0,0,0.06)" }}
             contentStyle={{
-              border: "1px solid var(--color-line)",
-              borderRadius: 12,
+              border: "2px solid var(--border)",
+              borderRadius: 8,
+              boxShadow: "var(--shadow)",
+              background: "var(--secondary-background)",
               fontFamily: "var(--font-mono)",
               fontSize: 12,
-              background: "#fff",
+              fontWeight: 700,
             }}
           />
           <Area
             type="monotone"
             dataKey="revenue"
-            stroke="var(--color-caramel)"
-            strokeWidth={2}
-            fill="var(--color-caramel)"
-            fillOpacity={0.12}
+            stroke="var(--main)"
+            strokeWidth={3}
+            fill="var(--blue)"
+            fillOpacity={1}
           />
         </AreaChart>
       </ResponsiveContainer>

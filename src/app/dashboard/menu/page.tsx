@@ -7,8 +7,8 @@ export default async function MenuPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-3xl font-medium tracking-tight">Menu</h1>
-        <p className="mt-1 text-sm text-muted">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight">Menu</h1>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">
           Toggle availability — sold-out items disappear from the shop page instantly.
         </p>
       </div>

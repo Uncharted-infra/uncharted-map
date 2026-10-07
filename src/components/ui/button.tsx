@@ -1,43 +1,55 @@
-import { cn } from "@/lib/utils";
+import { Button as ButtonPrimitive } from "@base-ui/react/button"
+import { cva, type VariantProps } from "class-variance-authority"
 
-type Variant = "caramel" | "ink" | "ghost";
-type Size = "sm" | "md" | "lg";
+import * as React from "react"
 
-const base =
-  "inline-flex items-center justify-center gap-2 rounded-xl font-mono text-[13px] font-bold tracking-wide uppercase transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none";
+import { cn } from "@/lib/utils"
 
-const variants: Record<Variant, string> = {
-  caramel: "bg-caramel text-white hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(217,142,50,0.35)]",
-  ink: "bg-ink text-cream hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(26,21,18,0.25)]",
-  ghost: "border border-line bg-white text-ink hover:-translate-y-0.5 hover:border-ink/30",
-};
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-base text-sm font-base ring-offset-white transition-all gap-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default:
+          "text-main-foreground bg-main border-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none",
+        noShadow: "text-main-foreground bg-main border-2 border-border",
+        neutral:
+          "bg-secondary-background text-foreground border-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none",
+        reverse:
+          "text-main-foreground bg-main border-2 border-border hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-shadow",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        xs: "h-8 gap-1.5 px-2.5 text-xs [&_svg]:size-3.5",
+        sm: "h-9 px-3",
+        lg: "h-11 px-8",
+        icon: "size-10",
+        "icon-xs": "size-8 [&_svg]:size-3.5",
+        "icon-sm": "size-9",
+        "icon-lg": "size-11",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
 
-const sizes: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-[11px]",
-  md: "px-5 py-2.5",
-  lg: "px-7 py-3.5 text-sm",
-};
-
-export function buttonClasses({
-  variant = "caramel",
-  size = "md",
+function Button({
   className,
-}: {
-  variant?: Variant;
-  size?: Size;
-  className?: string;
-} = {}) {
-  return cn(base, variants[variant], sizes[size], className);
-}
-
-export function Button({
-  variant = "caramel",
-  size = "md",
-  className,
+  variant,
+  size,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: Variant;
-  size?: Size;
-}) {
-  return <button className={buttonClasses({ variant, size, className })} {...props} />;
+}: React.ComponentProps<typeof ButtonPrimitive> &
+  VariantProps<typeof buttonVariants>) {
+  return (
+    <ButtonPrimitive
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
 }
+
+export { Button, buttonVariants }

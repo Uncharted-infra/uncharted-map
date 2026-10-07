@@ -8,10 +8,10 @@ export default async function OrdersPage() {
     <div>
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <h1 className="font-display text-3xl font-medium tracking-tight">Orders</h1>
-          <p className="mt-1 text-sm text-muted">Today&apos;s pickup queue.</p>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight">Orders</h1>
+          <p className="mt-1 text-sm font-medium text-muted-foreground">Today&apos;s pickup queue.</p>
         </div>
-        <span className="font-mono text-[11px] tracking-wide uppercase text-muted">
+        <span className="font-mono text-[11px] font-bold uppercase text-muted-foreground">
           {orders.filter((o) => o.status === "placed").length} new
         </span>
       </div>

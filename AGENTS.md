@@ -26,8 +26,8 @@ Same contract as the site: `src/lib/data/` provider interface. `MockProvider` se
 ## Design rules
 
 - Design source of truth: [`../docs/design-system.md`](../docs/design-system.md). Tokens duplicated in `src/app/globals.css` — keep in sync with the site app's copy.
-- The dashboard is data-dense but stays playful: flavor accents for categories/series, mono font for numbers/labels, no generic SaaS gray.
-- Charts: Recharts. Keep charts flat and legible — no gradients-as-decoration.
+- The dashboard is data-dense but stays playful: neobrutalist — white cards with 2px black borders and hard 4px shadows on a sand canvas, red main + blue accent for series/status, mono font for numbers/labels, no generic SaaS gray.
+- Charts: Recharts. Keep charts flat and legible — no gradients-as-decoration. Flat fills only; black outlines on bars.
 
 ## Engineering rules
 
