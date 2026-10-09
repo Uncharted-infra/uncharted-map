@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { toggleAvailabilityAction } from "@/app/dashboard/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,22 @@ export function MenuList({ items }: { items: MenuItem[] }) {
   const [availability, setAvailability] = useState<Record<string, boolean>>(
     Object.fromEntries(items.map((i) => [i.id, i.available]))
   );
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  const toggle = (itemId: string) => {
+    const next = !availability[itemId];
+    setError(null);
+    setAvailability((a) => ({ ...a, [itemId]: next }));
+    startTransition(async () => {
+      try {
+        await toggleAvailabilityAction(itemId, next);
+      } catch {
+        setAvailability((a) => ({ ...a, [itemId]: !next }));
+        setError("Couldn't update that item — try again.");
+      }
+    });
+  };
 
   const grouped = items.reduce<Record<string, MenuItem[]>>((acc, item) => {
     (acc[item.category] ??= []).push(item);
@@ -20,6 +37,7 @@ export function MenuList({ items }: { items: MenuItem[] }) {
 
   return (
     <div className="space-y-8">
+      {error && <p className="text-sm font-bold text-main">{error}</p>}
       {Object.entries(grouped).map(([category, catItems]) => (
         <section key={category}>
           <Badge variant="neutral" className="font-mono text-[11px] font-bold uppercase">
@@ -39,7 +57,7 @@ export function MenuList({ items }: { items: MenuItem[] }) {
                     <Button
                       size="sm"
                       variant={on ? "default" : "neutral"}
-                      onClick={() => setAvailability((a) => ({ ...a, [item.id]: !a[item.id] }))}
+                      onClick={() => toggle(item.id)}
                     >
                       {on ? "Available" : "Sold out"}
                     </Button>

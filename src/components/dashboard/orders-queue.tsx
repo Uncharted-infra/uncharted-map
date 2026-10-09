@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { advanceOrderAction } from "@/app/dashboard/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,13 +33,27 @@ const STATUS_FILL: Record<string, string> = {
 
 export function OrdersQueue({ initialOrders }: { initialOrders: Order[] }) {
   const [orders, setOrders] = useState(initialOrders);
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
   const active = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
   const done = orders.filter((o) => o.status === "completed" || o.status === "cancelled");
 
-  const advance = (id: string) =>
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id && NEXT[o.status] ? { ...o, status: NEXT[o.status]! } : o))
-    );
+  const advance = (id: string) => {
+    const prev = orders;
+    const order = prev.find((o) => o.id === id);
+    const next = order ? NEXT[order.status] : null;
+    if (!next) return;
+    setError(null);
+    setOrders(prev.map((o) => (o.id === id ? { ...o, status: next } : o)));
+    startTransition(async () => {
+      try {
+        await advanceOrderAction(id, next);
+      } catch {
+        setOrders(prev);
+        setError("Couldn't update that order — try again.");
+      }
+    });
+  };
 
   const renderOrder = (o: Order) => (
     <Card key={o.id} className="p-4">
@@ -74,6 +89,7 @@ export function OrdersQueue({ initialOrders }: { initialOrders: Order[] }) {
 
   return (
     <div className="space-y-6">
+      {error && <p className="text-sm font-bold text-main">{error}</p>}
       <div className="space-y-3">
         {active.length === 0 && <p className="text-sm font-medium text-muted-foreground">Queue is clear. Nice.</p>}
         {active.map(renderOrder)}

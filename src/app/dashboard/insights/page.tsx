@@ -1,7 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/components/ui/price";
-import { data, DEMO_SHOP_ID } from "@/lib/data";
+import { requireShop } from "@/lib/auth/shop";
+import { data } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -9,11 +10,12 @@ const FLAVOR_TONES = ["bg-main", "bg-blue", "bg-sand-deep", "bg-foreground", "bg
 const HEAT_STOPS = ["bg-blue/20", "bg-blue/40", "bg-blue/70", "bg-blue"] as const;
 
 export default async function InsightsPage() {
+  const shop = await requireShop();
   const [bestsellers, trends, networkTrends, heat] = await Promise.all([
-    data.getBestsellers(DEMO_SHOP_ID, 5),
-    data.getFlavorTrends(DEMO_SHOP_ID, 6),
-    data.getFlavorTrends(null, 6), // whole Alpharetta network
-    data.getDaypartHeat(DEMO_SHOP_ID),
+    data.getBestsellers(shop.id, 5),
+    data.getFlavorTrends(shop.id, 6),
+    data.getFlavorTrends(null, 6), // network-wide
+    data.getDaypartHeat(shop.id),
   ]);
 
   const maxHeat = Math.max(...heat.flat());
@@ -32,7 +34,7 @@ export default async function InsightsPage() {
         <div className="flex items-center gap-2">
           <Badge variant="neutral" className="font-bold uppercase">Flavor lab</Badge>
           <span className="font-mono text-[11px] font-bold uppercase">
-            What Alpharetta wants next
+            What the network wants next
           </span>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -52,7 +54,7 @@ export default async function InsightsPage() {
           ))}
         </div>
         <p className="mt-4 font-mono text-[11px] font-bold leading-relaxed">
-          Trends are aggregated across every sweet shop in Alpharetta — your menu
+          Trends are aggregated across every shop on Uncharted — your menu
           never sees the whole picture, but the network does.
         </p>
       </Card>

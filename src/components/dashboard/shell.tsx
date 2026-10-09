@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Shop } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -16,13 +17,14 @@ const LINKS = [
 const siteOrigin = process.env.NEXT_PUBLIC_SITE_ORIGIN ?? "http://localhost:3000";
 
 export function DashboardShell({
-  shopName,
+  shop,
   children,
 }: {
-  shopName: string;
+  shop: Shop;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const location = [shop.city, shop.state].filter(Boolean).join(", ");
 
   return (
     <div className="flex min-h-screen">
@@ -54,12 +56,20 @@ export function DashboardShell({
           >
             ← uncharted.sh
           </a>
+          <form action="/auth/signout" method="post" className="mt-1">
+            <button
+              type="submit"
+              className="block w-full rounded-base border-2 border-transparent px-3 py-2 text-left text-sm font-bold transition-colors hover:border-border hover:bg-secondary-background"
+            >
+              Sign out
+            </button>
+          </form>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b-2 border-border bg-background px-6">
-          <span className="font-display text-xl font-extrabold">{shopName}</span>
+          <span className="font-display text-xl font-extrabold">{shop.name}</span>
           <nav className="flex gap-4 text-sm font-bold md:hidden">
             {LINKS.map((l) => (
               <Link
@@ -71,9 +81,11 @@ export function DashboardShell({
               </Link>
             ))}
           </nav>
-          <span className="hidden rounded-base border-2 border-border bg-secondary-background px-2 py-0.5 font-mono text-xs font-bold md:block">
-            Alpharetta, GA
-          </span>
+          {location && (
+            <span className="hidden rounded-base border-2 border-border bg-secondary-background px-2 py-0.5 font-mono text-xs font-bold md:block">
+              {location}
+            </span>
+          )}
         </header>
         <main className="flex-1 px-6 py-8">{children}</main>
       </div>

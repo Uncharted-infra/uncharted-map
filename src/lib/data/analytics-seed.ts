@@ -96,7 +96,7 @@ export function seedOrdersFor(shopId: string): Order[] {
   return ORDER_NAMES.map((name, i) => {
     const rand = mulberry32(hashString(`${shopId}:order:${i}`));
     const lineCount = 1 + Math.floor(rand() * 2);
-    const lines = Array.from({ length: lineCount }, (_, j) => {
+    const lines = Array.from({ length: lineCount }, () => {
       const item = items[Math.floor(rand() * items.length)];
       const qty = 1 + Math.floor(rand() * 3);
       return { itemId: item.id, name: item.name, qty, unitPriceCents: item.priceCents };
