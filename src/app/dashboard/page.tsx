@@ -3,14 +3,16 @@ import { RevenueSparkline } from "@/components/dashboard/sparkline";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/components/ui/price";
-import { data, DEMO_SHOP_ID } from "@/lib/data";
+import { requireShop } from "@/lib/auth/shop";
+import { data } from "@/lib/data";
 
 export default async function DashboardPage() {
+  const shop = await requireShop();
   const [revenue, bestsellers, orders, suggestions] = await Promise.all([
-    data.getDailyRevenue(DEMO_SHOP_ID, 7),
-    data.getBestsellers(DEMO_SHOP_ID, 3),
-    data.getOrders(DEMO_SHOP_ID),
-    data.getReorderSuggestions(DEMO_SHOP_ID),
+    data.getDailyRevenue(shop.id, 7),
+    data.getBestsellers(shop.id, 3),
+    data.getOrders(shop.id),
+    data.getReorderSuggestions(shop.id),
   ]);
 
   const weekRevenue = revenue.reduce((n, d) => n + d.revenueCents, 0);

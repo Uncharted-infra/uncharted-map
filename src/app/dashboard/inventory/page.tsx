@@ -8,13 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { data, DEMO_SHOP_ID } from "@/lib/data";
+import { requireShop } from "@/lib/auth/shop";
+import { data } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 export default async function InventoryPage() {
+  const shop = await requireShop();
   const [inventory, suggestions] = await Promise.all([
-    data.getInventory(DEMO_SHOP_ID),
-    data.getReorderSuggestions(DEMO_SHOP_ID),
+    data.getInventory(shop.id),
+    data.getReorderSuggestions(shop.id),
   ]);
   const suggestionBySku = new Map(suggestions.map((s) => [s.item.sku, s]));
 

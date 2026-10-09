@@ -1,8 +1,10 @@
 import { MenuList } from "@/components/dashboard/menu-list";
-import { data, DEMO_SHOP_ID } from "@/lib/data";
+import { requireShop } from "@/lib/auth/shop";
+import { data } from "@/lib/data";
 
 export default async function MenuPage() {
-  const items = await data.getMenu(DEMO_SHOP_ID);
+  const shop = await requireShop();
+  const items = await data.getMenu(shop.id);
 
   return (
     <div>

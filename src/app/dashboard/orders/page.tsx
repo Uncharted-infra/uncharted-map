@@ -1,8 +1,10 @@
 import { OrdersQueue } from "@/components/dashboard/orders-queue";
-import { data, DEMO_SHOP_ID } from "@/lib/data";
+import { requireShop } from "@/lib/auth/shop";
+import { data } from "@/lib/data";
 
 export default async function OrdersPage() {
-  const orders = await data.getOrders(DEMO_SHOP_ID);
+  const shop = await requireShop();
+  const orders = await data.getOrders(shop.id);
 
   return (
     <div>

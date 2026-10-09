@@ -15,12 +15,12 @@ export default function Home() {
       </h1>
       <p className="mt-3 max-w-md font-medium text-muted-foreground">
         The owner side of Uncharted — sales, inventory, and flavor trends for
-        Alpharetta&apos;s sweet shops.
+        independent sweet shops.
       </p>
       <div className="mt-7 flex gap-3">
         <Button render={<Link href="/login" />} size="lg">Sign in</Button>
         <Button render={<Link href="/dashboard" />} variant="neutral" size="lg">
-          Demo dashboard
+          Open dashboard
         </Button>
       </div>
       <a href={siteOrigin} className="mt-10 font-mono text-[11px] font-bold uppercase text-muted-foreground hover:text-foreground">
