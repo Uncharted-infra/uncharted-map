@@ -19,8 +19,8 @@ export default function Home() {
       </p>
       <div className="mt-7 flex gap-3">
         <Button render={<Link href="/login" />} size="lg">Sign in</Button>
-        <Button render={<Link href="/dashboard" />} variant="neutral" size="lg">
-          Open dashboard
+        <Button render={<Link href="/signup" />} variant="neutral" size="lg">
+          Sign up
         </Button>
       </div>
       <a href={siteOrigin} className="mt-10 font-mono text-[11px] font-bold uppercase text-muted-foreground hover:text-foreground">
