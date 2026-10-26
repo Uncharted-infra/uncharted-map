@@ -1,4 +1,3 @@
-import { hasSupabaseEnv } from "@/lib/supabase/env";
 import type {
   Bestseller,
   DailyRevenue,
@@ -11,7 +10,6 @@ import type {
   Shop,
 } from "./types";
 import { mockProvider } from "./mock";
-import { supabaseProvider } from "./supabase";
 
 export interface DataProvider {
   getShops(): Promise<Shop[]>;
@@ -34,7 +32,7 @@ export interface DataProvider {
   ): Promise<void>;
 }
 
-export const data: DataProvider = hasSupabaseEnv() ? supabaseProvider : mockProvider;
+export const data: DataProvider = mockProvider;
 
 export type {
   Bestseller,

@@ -14,7 +14,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
 
   const callbackUrl = () => {
     const target =
-      next && next.startsWith("/") ? next : mode === "signup" ? "/onboarding" : "/dashboard";
+      next && next.startsWith("/") ? next : "/dashboard";
     return `${location.origin}/auth/callback?next=${encodeURIComponent(target)}`;
   };
 
